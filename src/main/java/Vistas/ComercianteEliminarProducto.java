@@ -1,6 +1,9 @@
 package Vistas;
 
+import Clases.ProductoNoEncontrado;
 import Clases.Productos;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.JOptionPane;
 
 public class ComercianteEliminarProducto extends javax.swing.JFrame {
@@ -58,7 +61,7 @@ public class ComercianteEliminarProducto extends javax.swing.JFrame {
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                     .addGroup(layout.createSequentialGroup()
                         .addContainerGap()
                         .addComponent(jLabel4))
@@ -66,7 +69,7 @@ public class ComercianteEliminarProducto extends javax.swing.JFrame {
                         .addContainerGap()
                         .addComponent(jLabel3)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(txtEliminar, javax.swing.GroupLayout.PREFERRED_SIZE, 128, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addComponent(txtEliminar))
                     .addGroup(layout.createSequentialGroup()
                         .addGap(42, 42, 42)
                         .addComponent(btnEliminar)
@@ -114,13 +117,11 @@ public class ComercianteEliminarProducto extends javax.swing.JFrame {
     private void btnEliminarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnEliminarActionPerformed
         boolean eliminado = false;        
         String buscarProducto = txtEliminar.getText();
-        
-        eliminado = nuevoProducto.eliminarProducto(buscarProducto);
-        
-        if(eliminado == true){
-            JOptionPane.showMessageDialog(null, "Producto Eliminado con éxito");
-        }else{
-            JOptionPane.showMessageDialog(null, "No se pudo encontrar el producto");
+             
+        try {
+            nuevoProducto.eliminarProducto(buscarProducto);
+        } catch (ProductoNoEncontrado ex) {
+            Logger.getLogger(ComercianteEliminarProducto.class.getName()).log(Level.SEVERE, null, ex);
         }
     }//GEN-LAST:event_btnEliminarActionPerformed
 
@@ -149,6 +150,18 @@ public class ComercianteEliminarProducto extends javax.swing.JFrame {
         } catch (javax.swing.UnsupportedLookAndFeelException ex) {
             java.util.logging.Logger.getLogger(ComercianteEliminarProducto.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         }
+        //</editor-fold>
+        //</editor-fold>
+        //</editor-fold>
+        //</editor-fold>
+        //</editor-fold>
+        //</editor-fold>
+        //</editor-fold>
+        //</editor-fold>
+        //</editor-fold>
+        //</editor-fold>
+        //</editor-fold>
+        //</editor-fold>
         //</editor-fold>
         //</editor-fold>
         //</editor-fold>

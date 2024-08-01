@@ -1,5 +1,6 @@
 package com.mycompany.proyectoclienteservidor;
 
+import Clases.Productos;
 import Vistas.IniciarSesion;
 
 /*

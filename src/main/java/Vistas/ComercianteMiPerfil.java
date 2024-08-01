@@ -1,11 +1,39 @@
 package Vistas;
 
-public class ComercianteMiPerfil extends javax.swing.JFrame {
+import Clases.Productos;
+import java.util.ArrayList;
+import javax.swing.table.DefaultTableModel;
+import javax.swing.table.TableModel;
 
+public class ComercianteMiPerfil extends javax.swing.JFrame {
+    DefaultTableModel dtmForm = new DefaultTableModel();
+    Productos misProductos = new Productos();
+    
     public ComercianteMiPerfil() {
         initComponents();
+        setModelo();
+        setDatos();
     }
-
+    
+    private void setModelo(){
+        String[] cabecera = {"Nombre","Precio","Categoria","Descripción"};
+        dtmForm.setColumnIdentifiers(cabecera);
+        tblProductos.setModel(dtmForm);
+    }
+    
+    private void setDatos(){
+        Object[] datos = new Object[dtmForm.getColumnCount()];
+        ArrayList<Productos> NuevosproductosColeccion = misProductos.DesSerializar();
+        
+        for(Productos producto : NuevosproductosColeccion){
+            datos[0] = producto.getNombre_producto();
+            datos[1] = producto.getPrecio();
+            datos[2] = producto.getCategoria_producto();
+            datos[3] = producto.getDescipcion_producto();
+            dtmForm.addRow(datos);
+        }    
+        tblProductos.setModel(dtmForm);
+    }
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -16,7 +44,7 @@ public class ComercianteMiPerfil extends javax.swing.JFrame {
     private void initComponents() {
 
         jScrollPane1 = new javax.swing.JScrollPane();
-        jTable1 = new javax.swing.JTable();
+        tblProductos = new javax.swing.JTable();
         jLabel1 = new javax.swing.JLabel();
         jLabel2 = new javax.swing.JLabel();
         jLabel3 = new javax.swing.JLabel();
@@ -30,18 +58,15 @@ public class ComercianteMiPerfil extends javax.swing.JFrame {
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
-        jTable1.setModel(new javax.swing.table.DefaultTableModel(
+        tblProductos.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null}
+
             },
             new String [] {
-                "Title 1", "Title 2", "Title 3", "Title 4"
+
             }
         ));
-        jScrollPane1.setViewportView(jTable1);
+        jScrollPane1.setViewportView(tblProductos);
 
         jLabel1.setText("Mis Productos:");
 
@@ -209,6 +234,6 @@ public class ComercianteMiPerfil extends javax.swing.JFrame {
     private javax.swing.JLabel jLabel6;
     private javax.swing.JLabel jLabel7;
     private javax.swing.JScrollPane jScrollPane1;
-    private javax.swing.JTable jTable1;
+    private javax.swing.JTable tblProductos;
     // End of variables declaration//GEN-END:variables
 }

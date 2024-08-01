@@ -1,4 +1,3 @@
-
 package Vistas;
 
 /**
@@ -7,9 +6,6 @@ package Vistas;
  */
 public class menuClientes extends javax.swing.JFrame {
 
-    /**
-     * Creates new form menuClientes
-     */
     public menuClientes() {
         initComponents();
     }
@@ -101,7 +97,9 @@ public class menuClientes extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void btnBuscarProductoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnBuscarProductoActionPerformed
-        // TODO add your handling code here:
+        ClientesBuscarProducto cbp = new ClientesBuscarProducto();
+        cbp.setVisible(true);
+        this.dispose(); 
     }//GEN-LAST:event_btnBuscarProductoActionPerformed
 
     private void btnVolverActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnVolverActionPerformed
