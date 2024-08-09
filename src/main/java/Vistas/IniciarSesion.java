@@ -1,9 +1,18 @@
 package Vistas;
 
+import Clases.ComercianteNoEncontrado;
+import Clases.Comerciantes;
 import java.awt.Color;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.swing.JOptionPane;
 
 public class IniciarSesion extends javax.swing.JFrame {
-
     public IniciarSesion() {
         initComponents();
     }
@@ -15,9 +24,9 @@ public class IniciarSesion extends javax.swing.JFrame {
         btnIniciarSesion = new javax.swing.JButton();
         jLabel1 = new javax.swing.JLabel();
         lblNombreEmpresa = new javax.swing.JLabel();
-        txtNombreEmpresa = new javax.swing.JTextField();
+        txtCorreoElectronico = new javax.swing.JTextField();
         lblDescripcion = new javax.swing.JLabel();
-        txtDescripcion = new javax.swing.JTextField();
+        txtContrasena = new javax.swing.JTextField();
         btnCliente = new javax.swing.JButton();
         jLabel2 = new javax.swing.JLabel();
         btnIrARegistro = new javax.swing.JButton();
@@ -110,8 +119,8 @@ public class IniciarSesion extends javax.swing.JFrame {
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                                .addComponent(txtNombreEmpresa)
-                                .addComponent(txtDescripcion, javax.swing.GroupLayout.PREFERRED_SIZE, 250, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                .addComponent(txtCorreoElectronico)
+                                .addComponent(txtContrasena, javax.swing.GroupLayout.PREFERRED_SIZE, 250, javax.swing.GroupLayout.PREFERRED_SIZE))
                             .addGroup(layout.createSequentialGroup()
                                 .addGap(12, 12, 12)
                                 .addComponent(btnIniciarSesion))))
@@ -137,11 +146,11 @@ public class IniciarSesion extends javax.swing.JFrame {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(lblNombreEmpresa)
-                    .addComponent(txtNombreEmpresa, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(txtCorreoElectronico, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(lblDescripcion)
-                    .addComponent(txtDescripcion, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(txtContrasena, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(btnIniciarSesion)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
@@ -165,9 +174,49 @@ public class IniciarSesion extends javax.swing.JFrame {
     }//GEN-LAST:event_btnIniciarSesionMouseExited
 
     private void btnIniciarSesionActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnIniciarSesionActionPerformed
-        menuComerciante mc = new menuComerciante();
-        mc.setVisible(true);
-        this.dispose();
+        String correoIngresado = txtCorreoElectronico.getText();
+        String contrasenaIngresado = txtContrasena.getText();        
+        String correoEncontrado = "";
+        String contrasenaEncontrado = "";
+        int idEncontrado = 0;
+        
+        try {
+            //Conexión con la base de datos
+            Connection nuevaConexion = DriverManager.getConnection("jdbc:mysql://localhost/proyectoClienteServidor?serverTimezone=UTC", "root", "Ar4y4.24");
+            
+            //Comando
+            String comandoSelect = "SELECT * FROM proyectoClienteServidor.comerciantes WHERE correoElectronico = ?";
+            PreparedStatement comandoSelectPreparado = nuevaConexion.prepareStatement(comandoSelect);
+        
+            //Definimos los parametros
+            comandoSelectPreparado.setString(1, correoIngresado);
+            
+            ResultSet datos = comandoSelectPreparado.executeQuery();
+            
+            while(datos.next()){
+                idEncontrado = datos.getInt("id");
+                correoEncontrado = datos.getString("correoElectronico");
+                contrasenaEncontrado = datos.getString("contrasena");            
+            }//else{
+            
+            if(correoIngresado.equals(correoEncontrado)){
+                if(contrasenaIngresado.equals(contrasenaEncontrado)){
+                    menuComerciante mc = new menuComerciante(idEncontrado);
+                    mc.setVisible(true);
+                    System.out.print("Id: " + idEncontrado + "/nCorreo: " + correoEncontrado + "\n Contraseña: " + contrasenaEncontrado);
+                }else{
+                    throw new ComercianteNoEncontrado("Correo eléctrónico o contraseña inválidos");
+                }
+            }else{
+                throw new ComercianteNoEncontrado("Correo eléctrónico o contraseña inválidos");
+            }            
+            //}
+        } catch (SQLException ex) {
+            System.out.print("Error: " + ex.getMessage());
+        }  catch (ComercianteNoEncontrado ex) {
+            Logger.getLogger(IniciarSesion.class.getName()).log(Level.SEVERE, null, ex);
+        }                   
+       
     }//GEN-LAST:event_btnIniciarSesionActionPerformed
 
     private void btnIrARegistroMouseEntered(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_btnIrARegistroMouseEntered
@@ -235,7 +284,7 @@ public class IniciarSesion extends javax.swing.JFrame {
     private javax.swing.JLabel jLabel4;
     private javax.swing.JLabel lblDescripcion;
     private javax.swing.JLabel lblNombreEmpresa;
-    private javax.swing.JTextField txtDescripcion;
-    private javax.swing.JTextField txtNombreEmpresa;
+    private javax.swing.JTextField txtContrasena;
+    private javax.swing.JTextField txtCorreoElectronico;
     // End of variables declaration//GEN-END:variables
 }

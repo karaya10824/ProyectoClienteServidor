@@ -34,12 +34,12 @@
                           <Group type="102" attributes="0">
                               <Component id="lblDescripcion1" min="-2" max="-2" attributes="0"/>
                               <EmptySpace type="separate" max="-2" attributes="0"/>
-                              <Component id="txtDescripcion1" min="-2" pref="241" max="-2" attributes="0"/>
+                              <Component id="txtContrasena" min="-2" pref="241" max="-2" attributes="0"/>
                           </Group>
                           <Group type="102" alignment="0" attributes="0">
                               <Component id="lblNombreEmpresa1" min="-2" max="-2" attributes="0"/>
                               <EmptySpace type="separate" max="-2" attributes="0"/>
-                              <Component id="txtNombreEmpresa1" min="-2" pref="198" max="-2" attributes="0"/>
+                              <Component id="txtCorreoComerciante" min="-2" pref="198" max="-2" attributes="0"/>
                           </Group>
                       </Group>
                   </Group>
@@ -49,12 +49,12 @@
                           <Group type="102" alignment="0" attributes="0">
                               <Component id="lblContacto" min="-2" max="-2" attributes="0"/>
                               <EmptySpace type="unrelated" max="-2" attributes="0"/>
-                              <Component id="txtContacto" max="32767" attributes="0"/>
+                              <Component id="txtNumeroContacto" max="32767" attributes="0"/>
                           </Group>
                           <Group type="102" alignment="0" attributes="0">
                               <Component id="lblDireccion" min="-2" max="-2" attributes="0"/>
                               <EmptySpace type="separate" max="-2" attributes="0"/>
-                              <Component id="txtDireccion" min="-2" pref="254" max="-2" attributes="0"/>
+                              <Component id="txtDireccionComercio" min="-2" pref="254" max="-2" attributes="0"/>
                           </Group>
                       </Group>
                   </Group>
@@ -96,12 +96,12 @@
               <EmptySpace type="separate" max="-2" attributes="0"/>
               <Group type="103" groupAlignment="3" attributes="0">
                   <Component id="lblNombreEmpresa1" alignment="3" min="-2" max="-2" attributes="0"/>
-                  <Component id="txtNombreEmpresa1" alignment="3" min="-2" max="-2" attributes="0"/>
+                  <Component id="txtCorreoComerciante" alignment="3" min="-2" max="-2" attributes="0"/>
               </Group>
               <EmptySpace max="-2" attributes="0"/>
               <Group type="103" groupAlignment="3" attributes="0">
                   <Component id="lblDescripcion1" alignment="3" min="-2" max="-2" attributes="0"/>
-                  <Component id="txtDescripcion1" alignment="3" min="-2" max="-2" attributes="0"/>
+                  <Component id="txtContrasena" alignment="3" min="-2" max="-2" attributes="0"/>
               </Group>
               <EmptySpace max="-2" attributes="0"/>
               <Group type="103" groupAlignment="3" attributes="0">
@@ -116,12 +116,12 @@
               <EmptySpace max="-2" attributes="0"/>
               <Group type="103" groupAlignment="3" attributes="0">
                   <Component id="lblDireccion" alignment="3" min="-2" max="-2" attributes="0"/>
-                  <Component id="txtDireccion" alignment="3" min="-2" max="-2" attributes="0"/>
+                  <Component id="txtDireccionComercio" alignment="3" min="-2" max="-2" attributes="0"/>
               </Group>
               <EmptySpace max="-2" attributes="0"/>
               <Group type="103" groupAlignment="0" attributes="0">
                   <Component id="lblContacto" min="-2" max="-2" attributes="0"/>
-                  <Component id="txtContacto" min="-2" max="-2" attributes="0"/>
+                  <Component id="txtNumeroContacto" min="-2" max="-2" attributes="0"/>
               </Group>
               <EmptySpace type="separate" max="-2" attributes="0"/>
               <Group type="103" groupAlignment="3" attributes="0">
@@ -162,7 +162,7 @@
         <Property name="text" type="java.lang.String" value="Direcci&#xf3;n:"/>
       </Properties>
     </Component>
-    <Component class="javax.swing.JTextField" name="txtDireccion">
+    <Component class="javax.swing.JTextField" name="txtDireccionComercio">
     </Component>
     <Component class="javax.swing.JLabel" name="lblContacto">
       <Properties>
@@ -172,7 +172,7 @@
         <Property name="text" type="java.lang.String" value="N&#xfa;mero de Contacto:"/>
       </Properties>
     </Component>
-    <Component class="javax.swing.JTextField" name="txtContacto">
+    <Component class="javax.swing.JTextField" name="txtNumeroContacto">
     </Component>
     <Component class="javax.swing.JButton" name="btnRegistrar">
       <Properties>
@@ -203,7 +203,7 @@
         <Property name="text" type="java.lang.String" value="Correo El&#xe9;ctronico:"/>
       </Properties>
     </Component>
-    <Component class="javax.swing.JTextField" name="txtNombreEmpresa1">
+    <Component class="javax.swing.JTextField" name="txtCorreoComerciante">
     </Component>
     <Component class="javax.swing.JLabel" name="lblDescripcion1">
       <Properties>
@@ -213,7 +213,7 @@
         <Property name="text" type="java.lang.String" value="Contrase&#xf1;a:"/>
       </Properties>
     </Component>
-    <Component class="javax.swing.JTextField" name="txtDescripcion1">
+    <Component class="javax.swing.JTextField" name="txtContrasena">
     </Component>
     <Component class="javax.swing.JButton" name="btnCerrar">
       <Properties>
