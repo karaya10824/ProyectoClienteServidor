@@ -14,12 +14,13 @@ import javax.swing.JOptionPane;
 
 public class Productos implements Serializable{
     //Variables para la información de cada producto.
+    public int id;
     public String nombre_producto;
     public String descipcion_producto;
     public int precio;
     public String categoria_producto;
     //String imagen; FALTA AGREGAR ESTO AL CONSTRUCTOR, GETTER Y SETTER  
-    ArrayList<Productos> productosColeccion = new ArrayList();
+    ArrayList<Productos> productosColeccion = new ArrayList<Productos>();
 
     //Sección de Constructores de las Clases
     public Productos(){}
@@ -64,6 +65,14 @@ public class Productos implements Serializable{
     public void setCategoria_producto(String categoria_producto) {
         this.categoria_producto = categoria_producto;
     }    
+
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }        
     //Fin de Getters y Setters
     
     //Método para guardar los productos de la colección

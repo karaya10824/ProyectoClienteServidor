@@ -1,5 +1,13 @@
 package Clases;
 
+import Vistas.menuComerciante;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import javax.swing.JOptionPane;
+
 public class Comerciantes {
     public String nombre_empresa;
     public String descripcion_empresa;
@@ -47,7 +55,48 @@ public class Comerciantes {
         this.contacto = contacto;
     }
     
+    public boolean IniciarSesion(String correoIngresado, String contrasenaIngresado) throws ComercianteNoEncontrado{
+        String correoEncontrado = "";
+        String contrasenaEncontrado = "";
+        int idEncontrado = 0;
+        
+        try {
+            //Conexión con la base de datos
+            Connection nuevaConexion = DriverManager.getConnection("jdbc:mysql://localhost/proyectoClienteServidor?serverTimezone=UTC", "root", "Ar4y4.24");
+            
+            //Comando
+            String comandoSelect = "SELECT * FROM proyectoClienteServidor.comerciantes WHERE correoElectronico = ?";
+            PreparedStatement comandoSelectPreparado = nuevaConexion.prepareStatement(comandoSelect);
+        
+            //Definimos los parametros
+            comandoSelectPreparado.setString(1, correoIngresado);
+            
+            ResultSet datos = comandoSelectPreparado.executeQuery();
+            
+            while(datos.next()){
+                idEncontrado = datos.getInt("id");
+                correoEncontrado = datos.getString("correoElectronico");
+                contrasenaEncontrado = datos.getString("contrasena");            
+            }//else{
+            
+            if(correoIngresado.equals(correoEncontrado)){
+                if(contrasenaIngresado.equals(contrasenaEncontrado)){
+                    System.out.print("Id: " + idEncontrado + "/nCorreo: " + correoEncontrado + "\n Contraseña: " + contrasenaEncontrado);
+                   return true;
+                }else{
+                    throw new ComercianteNoEncontrado("Correo eléctrónico o contraseña inválidos");
+                }
+            }else{
+                throw new ComercianteNoEncontrado("Correo eléctrónico o contraseña inválidos");
+            }            
+            //}
+        } catch (SQLException ex) {
+            System.out.print("Error: " + ex.getMessage());
+            return false;
+        }             
+    } 
     
+    public void mostrarProductos(){
     
-    
+    }
 }

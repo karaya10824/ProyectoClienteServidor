@@ -1,8 +1,10 @@
 package Vistas;
 
 public class ComercianteCrearCodigoPromocional extends javax.swing.JFrame {
-
-    public ComercianteCrearCodigoPromocional() {
+    public int identificadorUsuario;
+    
+    public ComercianteCrearCodigoPromocional(int id) {
+        this.identificadorUsuario = id;
         initComponents();
     }
 
@@ -78,7 +80,7 @@ public class ComercianteCrearCodigoPromocional extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void btnCerrarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCerrarActionPerformed
-        menuComerciante mC = new menuComerciante();
+        menuComerciante mC = new menuComerciante(identificadorUsuario);
         mC.setVisible(true);
         this.dispose();
     }//GEN-LAST:event_btnCerrarActionPerformed
@@ -120,7 +122,7 @@ public class ComercianteCrearCodigoPromocional extends javax.swing.JFrame {
         /* Create and display the form */
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
-                new ComercianteCrearCodigoPromocional().setVisible(true);
+
             }
         });
     }

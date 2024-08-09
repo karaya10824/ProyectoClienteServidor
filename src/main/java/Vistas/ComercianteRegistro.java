@@ -1,6 +1,9 @@
 package Vistas;
 
 import java.awt.Color;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
 
 public class ComercianteRegistro extends javax.swing.JFrame {
 
@@ -17,15 +20,15 @@ public class ComercianteRegistro extends javax.swing.JFrame {
         lblDescripcion = new javax.swing.JLabel();
         txtDescripcion = new javax.swing.JTextField();
         lblDireccion = new javax.swing.JLabel();
-        txtDireccion = new javax.swing.JTextField();
+        txtDireccionComercio = new javax.swing.JTextField();
         lblContacto = new javax.swing.JLabel();
-        txtContacto = new javax.swing.JTextField();
+        txtNumeroContacto = new javax.swing.JTextField();
         btnRegistrar = new javax.swing.JButton();
         jLabel1 = new javax.swing.JLabel();
         lblNombreEmpresa1 = new javax.swing.JLabel();
-        txtNombreEmpresa1 = new javax.swing.JTextField();
+        txtCorreoComerciante = new javax.swing.JTextField();
         lblDescripcion1 = new javax.swing.JLabel();
-        txtDescripcion1 = new javax.swing.JTextField();
+        txtContrasena = new javax.swing.JTextField();
         btnCerrar = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
@@ -96,22 +99,22 @@ public class ComercianteRegistro extends javax.swing.JFrame {
                             .addGroup(layout.createSequentialGroup()
                                 .addComponent(lblDescripcion1)
                                 .addGap(18, 18, 18)
-                                .addComponent(txtDescripcion1, javax.swing.GroupLayout.PREFERRED_SIZE, 241, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                .addComponent(txtContrasena, javax.swing.GroupLayout.PREFERRED_SIZE, 241, javax.swing.GroupLayout.PREFERRED_SIZE))
                             .addGroup(layout.createSequentialGroup()
                                 .addComponent(lblNombreEmpresa1)
                                 .addGap(18, 18, 18)
-                                .addComponent(txtNombreEmpresa1, javax.swing.GroupLayout.PREFERRED_SIZE, 198, javax.swing.GroupLayout.PREFERRED_SIZE))))
+                                .addComponent(txtCorreoComerciante, javax.swing.GroupLayout.PREFERRED_SIZE, 198, javax.swing.GroupLayout.PREFERRED_SIZE))))
                     .addGroup(layout.createSequentialGroup()
                         .addContainerGap()
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                             .addGroup(layout.createSequentialGroup()
                                 .addComponent(lblContacto)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                                .addComponent(txtContacto))
+                                .addComponent(txtNumeroContacto))
                             .addGroup(layout.createSequentialGroup()
                                 .addComponent(lblDireccion)
                                 .addGap(18, 18, 18)
-                                .addComponent(txtDireccion, javax.swing.GroupLayout.PREFERRED_SIZE, 254, javax.swing.GroupLayout.PREFERRED_SIZE))))
+                                .addComponent(txtDireccionComercio, javax.swing.GroupLayout.PREFERRED_SIZE, 254, javax.swing.GroupLayout.PREFERRED_SIZE))))
                     .addGroup(layout.createSequentialGroup()
                         .addContainerGap()
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
@@ -141,11 +144,11 @@ public class ComercianteRegistro extends javax.swing.JFrame {
                 .addGap(18, 18, 18)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(lblNombreEmpresa1)
-                    .addComponent(txtNombreEmpresa1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(txtCorreoComerciante, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(lblDescripcion1)
-                    .addComponent(txtDescripcion1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(txtContrasena, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(lblNombreEmpresa)
@@ -157,11 +160,11 @@ public class ComercianteRegistro extends javax.swing.JFrame {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(lblDireccion)
-                    .addComponent(txtDireccion, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(txtDireccionComercio, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(lblContacto)
-                    .addComponent(txtContacto, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(txtNumeroContacto, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addGap(18, 18, 18)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(btnRegistrar)
@@ -183,7 +186,29 @@ public class ComercianteRegistro extends javax.swing.JFrame {
     }//GEN-LAST:event_btnRegistrarMouseExited
 
     private void btnRegistrarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnRegistrarActionPerformed
-        // TODO add your handling code here:
+        try {
+            //Conexión con la base de datos
+            Connection nuevaConexion = DriverManager.getConnection("jdbc:mysql://localhost/proyectoClienteServidor?serverTimezone=UTC", "root", "Ar4y4.24");
+            //Comando
+            String comandoInsert = "insert into proyectoClienteServidor.comerciantes (correoElectronico, contrasena, nombreEmpresa, descripcion, direccionComercio, NumeroContacto) values (?,?,?,?,?,?)";
+            PreparedStatement comandoInsertPreparado = nuevaConexion.prepareStatement(comandoInsert);
+            
+            //Definimos los parametros
+            comandoInsertPreparado.setString(1, txtCorreoComerciante.getText());
+            comandoInsertPreparado.setString(2, txtContrasena.getText());
+            comandoInsertPreparado.setString(3, txtNombreEmpresa.getText());
+            comandoInsertPreparado.setString(4, txtDescripcion.getText());
+            comandoInsertPreparado.setString(5, txtDireccionComercio.getText());
+            comandoInsertPreparado.setString(6, txtNumeroContacto.getText());
+            
+            //Ejecutamos el comando
+            comandoInsertPreparado.executeUpdate();
+            
+            //Mensaje final
+            System.out.print("Se ha ingresado el registro correctamente");
+        } catch (Exception ex) {
+            System.out.print("Error: " + ex.getMessage());
+        }
     }//GEN-LAST:event_btnRegistrarActionPerformed
 
     private void btnCerrarMouseEntered(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_btnCerrarMouseEntered
@@ -246,11 +271,11 @@ public class ComercianteRegistro extends javax.swing.JFrame {
     private javax.swing.JLabel lblDireccion;
     private javax.swing.JLabel lblNombreEmpresa;
     private javax.swing.JLabel lblNombreEmpresa1;
-    private javax.swing.JTextField txtContacto;
+    private javax.swing.JTextField txtContrasena;
+    private javax.swing.JTextField txtCorreoComerciante;
     private javax.swing.JTextField txtDescripcion;
-    private javax.swing.JTextField txtDescripcion1;
-    private javax.swing.JTextField txtDireccion;
+    private javax.swing.JTextField txtDireccionComercio;
     private javax.swing.JTextField txtNombreEmpresa;
-    private javax.swing.JTextField txtNombreEmpresa1;
+    private javax.swing.JTextField txtNumeroContacto;
     // End of variables declaration//GEN-END:variables
 }

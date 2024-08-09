@@ -8,15 +8,17 @@ import javax.swing.table.TableModel;
 public class ComercianteMiPerfil extends javax.swing.JFrame {
     DefaultTableModel dtmForm = new DefaultTableModel();
     Productos misProductos = new Productos();
+    public int identificadorUsuario;
     
-    public ComercianteMiPerfil() {
+    public ComercianteMiPerfil(int id) {
+        this.identificadorUsuario = id;
         initComponents();
         setModelo();
         setDatos();
     }
     
     private void setModelo(){
-        String[] cabecera = {"Nombre","Precio","Categoria","Descripción"};
+        String[] cabecera = {"ID", "Nombre","Precio","Categoria","Descripción"};
         dtmForm.setColumnIdentifiers(cabecera);
         tblProductos.setModel(dtmForm);
     }
@@ -26,11 +28,14 @@ public class ComercianteMiPerfil extends javax.swing.JFrame {
         ArrayList<Productos> NuevosproductosColeccion = misProductos.DesSerializar();
         
         for(Productos producto : NuevosproductosColeccion){
-            datos[0] = producto.getNombre_producto();
-            datos[1] = producto.getPrecio();
-            datos[2] = producto.getCategoria_producto();
-            datos[3] = producto.getDescipcion_producto();
+            if(producto.getId() == identificadorUsuario){
+            datos[0] = producto.getId();
+            datos[1] = producto.getNombre_producto();
+            datos[2] = producto.getPrecio();
+            datos[3] = producto.getCategoria_producto();
+            datos[4] = producto.getDescipcion_producto();
             dtmForm.addRow(datos);
+            }
         }    
         tblProductos.setModel(dtmForm);
     }
@@ -167,19 +172,19 @@ public class ComercianteMiPerfil extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void btnCerrarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCerrarActionPerformed
-        menuComerciante mC = new menuComerciante();
+        menuComerciante mC = new menuComerciante(identificadorUsuario);
         mC.setVisible(true);
         this.dispose();
     }//GEN-LAST:event_btnCerrarActionPerformed
 
     private void btnModificarContactoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnModificarContactoActionPerformed
-        modificarContacto mc = new modificarContacto();
+        modificarContacto mc = new modificarContacto(identificadorUsuario);
         mc.setVisible(true);
         this.dispose();
     }//GEN-LAST:event_btnModificarContactoActionPerformed
 
     private void btnModificarDevoluActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnModificarDevoluActionPerformed
-        modificarPoliticas mp = new modificarPoliticas();
+        modificarPoliticas mp = new modificarPoliticas(identificadorUsuario);
         mp.setVisible(true);
         this.dispose();
     }//GEN-LAST:event_btnModificarDevoluActionPerformed
@@ -217,7 +222,6 @@ public class ComercianteMiPerfil extends javax.swing.JFrame {
         /* Create and display the form */
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
-                new ComercianteMiPerfil().setVisible(true);
             }
         });
     }

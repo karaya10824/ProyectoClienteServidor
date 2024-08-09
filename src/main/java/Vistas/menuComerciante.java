@@ -1,8 +1,9 @@
 package Vistas;
 
 public class menuComerciante extends javax.swing.JFrame {
-
-    public menuComerciante() {
+    public int identificadorUsuario;
+    public menuComerciante(int id) {
+        this.identificadorUsuario = id;
         initComponents();
     }
 
@@ -134,13 +135,13 @@ public class menuComerciante extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void btnCrearPromocionActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCrearPromocionActionPerformed
-        ComercianteCrearCodigoPromocional cp = new ComercianteCrearCodigoPromocional();
+        ComercianteCrearCodigoPromocional cp = new ComercianteCrearCodigoPromocional(identificadorUsuario);
         cp.setVisible(true);
         this.dispose();
     }//GEN-LAST:event_btnCrearPromocionActionPerformed
 
     private void btnMiPerfilActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnMiPerfilActionPerformed
-        ComercianteMiPerfil mp = new ComercianteMiPerfil();
+        ComercianteMiPerfil mp = new ComercianteMiPerfil(identificadorUsuario);
         mp.setVisible(true);
         this.dispose();
     }//GEN-LAST:event_btnMiPerfilActionPerformed
@@ -156,19 +157,19 @@ public class menuComerciante extends javax.swing.JFrame {
     }//GEN-LAST:event_btnGestionarPedidosActionPerformed
 
     private void btnAgregarProductoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAgregarProductoActionPerformed
-        ComercianteAgregarProducto ap = new ComercianteAgregarProducto();
+        ComercianteAgregarProducto ap = new ComercianteAgregarProducto(identificadorUsuario);
         ap.setVisible(true);
         this.dispose(); 
     }//GEN-LAST:event_btnAgregarProductoActionPerformed
 
     private void btnEditarProductoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnEditarProductoActionPerformed
-        ComercianteEditarProducto ep = new ComercianteEditarProducto();
+        ComercianteEditarProducto ep = new ComercianteEditarProducto(identificadorUsuario);
         ep.setVisible(true);
         this.dispose(); 
     }//GEN-LAST:event_btnEditarProductoActionPerformed
 
     private void btnEliminarProductoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnEliminarProductoActionPerformed
-        ComercianteEliminarProducto ep = new ComercianteEliminarProducto();
+        ComercianteEliminarProducto ep = new ComercianteEliminarProducto(identificadorUsuario);
         ep.setVisible(true);
         this.dispose(); 
     }//GEN-LAST:event_btnEliminarProductoActionPerformed
@@ -204,7 +205,6 @@ public class menuComerciante extends javax.swing.JFrame {
         /* Create and display the form */
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
-                new menuComerciante().setVisible(true);
             }
         });
     }

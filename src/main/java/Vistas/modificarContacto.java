@@ -1,19 +1,9 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/GUIForms/JFrame.java to edit this template
- */
 package Vistas;
 
-/**
- *
- * @author kevin
- */
 public class modificarContacto extends javax.swing.JFrame {
-
-    /**
-     * Creates new form modificarContacto
-     */
-    public modificarContacto() {
+    public int identificadorUsuario;
+    public modificarContacto(int id) {
+        this.identificadorUsuario = id;
         initComponents();
     }
 
@@ -99,7 +89,7 @@ public class modificarContacto extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void btnCerrar1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCerrar1ActionPerformed
-        menuComerciante mC = new menuComerciante();
+        menuComerciante mC = new menuComerciante(identificadorUsuario);
         mC.setVisible(true);
         this.dispose();
     }//GEN-LAST:event_btnCerrar1ActionPerformed
@@ -135,7 +125,6 @@ public class modificarContacto extends javax.swing.JFrame {
         /* Create and display the form */
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
-                new modificarContacto().setVisible(true);
             }
         });
     }

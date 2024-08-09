@@ -7,11 +7,13 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public class ComercianteAgregarProducto extends javax.swing.JFrame {
-
-    public ComercianteAgregarProducto() {
+    public int identificadorUsuario;
+    
+    public ComercianteAgregarProducto(int id) {
+        this.identificadorUsuario = id;
         initComponents();
     }
-    
+   
     @SuppressWarnings("unchecked")
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
@@ -149,7 +151,7 @@ public class ComercianteAgregarProducto extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void btnCerrarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCerrarActionPerformed
-        menuComerciante mC = new menuComerciante();
+        menuComerciante mC = new menuComerciante(identificadorUsuario);
         mC.setVisible(true);
         this.dispose();
     }//GEN-LAST:event_btnCerrarActionPerformed
@@ -164,6 +166,9 @@ public class ComercianteAgregarProducto extends javax.swing.JFrame {
         nuevoProducto.setDescipcion_producto(txtDescripcion.getText());
         nuevoProducto.setPrecio(precio);
         nuevoProducto.setCategoria_producto(txtCategoria.getText());
+        
+        
+        nuevoProducto.setId(identificadorUsuario);
 
         //Limpiamos las variable para que el comerciante pueda agregar un nuevo producto.
         txtNombre.setText("");
@@ -208,7 +213,6 @@ public class ComercianteAgregarProducto extends javax.swing.JFrame {
         /* Create and display the form */
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
-                new ComercianteAgregarProducto().setVisible(true);
             }
         });
     }

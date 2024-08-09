@@ -6,8 +6,10 @@ import javax.swing.JOptionPane;
 public class ComercianteEditarProducto extends javax.swing.JFrame {
     Productos buscarProducto = new Productos();
     Productos mostrarProducto = new Productos();
+    public int identificadorUsuario;
     
-    public ComercianteEditarProducto() {
+    public ComercianteEditarProducto(int id) {
+        this.identificadorUsuario = id;
         initComponents();
         buscarProducto = mostrarProducto.devolverProductos();   
         
@@ -202,7 +204,7 @@ public class ComercianteEditarProducto extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void btnCerrar1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCerrar1ActionPerformed
-        menuComerciante mC = new menuComerciante();
+        menuComerciante mC = new menuComerciante(identificadorUsuario);
         mC.setVisible(true);
         this.dispose();
     }//GEN-LAST:event_btnCerrar1ActionPerformed
@@ -252,7 +254,6 @@ public class ComercianteEditarProducto extends javax.swing.JFrame {
         /* Create and display the form */
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
-                new ComercianteEditarProducto().setVisible(true);
             }
         });
     }
