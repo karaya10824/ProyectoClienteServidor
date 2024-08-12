@@ -2,6 +2,7 @@ package Vistas;
 
 public class modificarContacto extends javax.swing.JFrame {
     public int identificadorUsuario;
+    
     public modificarContacto(int id) {
         this.identificadorUsuario = id;
         initComponents();
