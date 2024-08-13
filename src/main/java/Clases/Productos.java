@@ -75,28 +75,7 @@ public class Productos implements Serializable{
     }        
     //Fin de Getters y Setters
     
-    //Método para guardar los productos de la colección
-    public void Serializar(){
-        try(                
-            FileOutputStream fileSalida = new FileOutputStream("productos.bd");
-            ObjectOutputStream Vserializador = new ObjectOutputStream(fileSalida);){
-            
-            Vserializador.writeObject(productosColeccion);
-            
-            for (Productos Producto : productosColeccion){
-                System.out.print("Producto: "+ Producto.getNombre_producto() + "\n");
-            }
-            
-            fileSalida.close();
-            Vserializador.close();
-        } catch (FileNotFoundException ex) {
-            System.out.print(ex);
-        } catch (IOException i) {
-            System.out.print(i);
-        }
-    }
-    
-    //Método para obtener los productos de la colección
+    //Método para obtener los productos de la colección    
     public ArrayList<Productos> DesSerializar(){
         try {                   
             FileInputStream fileEntrada = new FileInputStream("productos.bd");
@@ -111,95 +90,9 @@ public class Productos implements Serializable{
         return productosColeccion;  
     }
     
-    //Método para agregar productos a la colección
-    public void agregarProducto(Productos p){
-        DesSerializar();         
-        productosColeccion.add(p);        
-        Serializar();    
-    }
-    
-    //Método para eliminar productos a la colección
-    public void eliminarProducto(String buscarProducto) throws ProductoNoEncontrado{
-        DesSerializar(); 
-        boolean productoEncontrado = false;
-        
-        for (int i = 0; i < productosColeccion.size(); i++){
-            if(productosColeccion.get(i).getNombre_producto().equals(buscarProducto)){
-                productosColeccion.remove(productosColeccion.get(i));
-                productoEncontrado = true;
-            }
-        }
-        
-        if(productoEncontrado){
-            JOptionPane.showMessageDialog(null, "El producto " + buscarProducto + " fue eliminado con éxito.");
-        }else{
-            throw new ProductoNoEncontrado("El producto " + buscarProducto + " no fue encontrado.");
-        }
-        Serializar();                
-    }
-    
-    //Método para editar productos a la colección
-    public boolean editarProducto(Productos modificado, Productos viejo){
-        ArrayList<Productos> NuevosproductosColeccion = DesSerializar(); 
-        boolean productoEncontrado = false;
-        
-        System.out.println("Nombre Viejo: " + viejo.getNombre_producto());
-        
-        System.out.print("Nombre nuevo: " + modificado.getNombre_producto());
-        System.out.print("Descripcion nuevo: " + modificado.getDescipcion_producto() + "\n");
-        
-        //for (int i = 0; i < productosColeccion.size(); i++){
-            if(NuevosproductosColeccion.contains(viejo)){
-                //productosColeccion.get(i).setNombre_producto(modificado.getNombre_producto());
-                //productosColeccion.get(i).setCategoria_producto(modificado.getCategoria_producto());
-                //productosColeccion.get(i).setDescipcion_producto(modificado.getDescipcion_producto());
-                //productosColeccion.get(i).setPrecio(modificado.getPrecio());
-                productoEncontrado = true;
-                JOptionPane.showMessageDialog(null, "Soy encontrado");
-            }
-            //JOptionPane.showMessageDialog(null, "Soy loop");
-        //}        
-        
-        /*if(productoEncontrado){
-            JOptionPane.showMessageDialog(null, "El producto " + buscarProducto + " fue eliminado con éxito.");
-        }else{
-            throw new ProductoNoEncontrado("El producto " + buscarProducto + " no fue encontrado.");
-        }*/
-        Serializar(); 
-        if(productoEncontrado){
-            return true;
-        }else{
-            return false;
-        }            
-    }
-    
-    //Método para devolver busqueda de un producto
-    public Productos devolverProductos(){
-        DesSerializar();
-        String ProductoEncontrar = JOptionPane.showInputDialog(null, "Ingrese el producto a buscar:");  
-        
-        Productos productoEncontrado = null;
-        
-        for (int i = 0; i < productosColeccion.size(); i++){
-            if(productosColeccion.get(i).getNombre_producto().equals(ProductoEncontrar)){
-                productoEncontrado = productosColeccion.get(i);
-            }
-        }
-        
-        return productoEncontrado;
-    }
-    
-    //Método para devolver busqueda de un producto para los clientes
-    public Productos ClientesdevolverProductos(String ProductoEncontrar){
-        DesSerializar();        
-        Productos productoEncontrado = null;
-        
-        for (int i = 0; i < productosColeccion.size(); i++){
-            if(productosColeccion.get(i).getNombre_producto().equals(ProductoEncontrar)){
-                productoEncontrado = productosColeccion.get(i);
-            }
-        }              
-                
-        return productoEncontrado;
+    @Override
+     public boolean equals (Object producto) {
+        Productos producto_equal = (Productos) producto;
+        return producto_equal.getNombre_producto().equals(this.nombre_producto);
     }
 }

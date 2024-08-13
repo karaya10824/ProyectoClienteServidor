@@ -90,9 +90,7 @@ public class modificarContacto extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void btnCerrar1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCerrar1ActionPerformed
-        menuComerciante mC = new menuComerciante(identificadorUsuario);
-        mC.setVisible(true);
-        this.dispose();
+
     }//GEN-LAST:event_btnCerrar1ActionPerformed
 
     /**

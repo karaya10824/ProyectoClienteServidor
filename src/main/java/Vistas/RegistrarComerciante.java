@@ -4,12 +4,78 @@ import java.awt.Color;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
+import javax.swing.JButton;
+import javax.swing.JTextField;
 
-public class ComercianteRegistro extends javax.swing.JFrame {
+public class RegistrarComerciante extends javax.swing.JFrame {
 
-    public ComercianteRegistro() {
+    public RegistrarComerciante() {
         initComponents();
     }
+
+    public JButton getBtnCerrar() {
+        return btnCerrar;
+    }
+
+    public void setBtnCerrar(JButton btnCerrar) {
+        this.btnCerrar = btnCerrar;
+    }
+
+    public JButton getBtnRegistrar() {
+        return btnRegistrar;
+    }
+
+    public void setBtnRegistrar(JButton btnRegistrar) {
+        this.btnRegistrar = btnRegistrar;
+    }
+
+    public JTextField getTxtContrasena() {
+        return txtContrasena;
+    }
+
+    public void setTxtContrasena(JTextField txtContrasena) {
+        this.txtContrasena = txtContrasena;
+    }
+
+    public JTextField getTxtCorreoComerciante() {
+        return txtCorreoComerciante;
+    }
+
+    public void setTxtCorreoComerciante(JTextField txtCorreoComerciante) {
+        this.txtCorreoComerciante = txtCorreoComerciante;
+    }
+
+    public JTextField getTxtDescripcion() {
+        return txtDescripcion;
+    }
+
+    public void setTxtDescripcion(JTextField txtDescripcion) {
+        this.txtDescripcion = txtDescripcion;
+    }
+
+    public JTextField getTxtDireccionComercio() {
+        return txtDireccionComercio;
+    }
+
+    public void setTxtDireccionComercio(JTextField txtDireccionComercio) {
+        this.txtDireccionComercio = txtDireccionComercio;
+    }
+
+    public JTextField getTxtNombreEmpresa() {
+        return txtNombreEmpresa;
+    }
+
+    public void setTxtNombreEmpresa(JTextField txtNombreEmpresa) {
+        this.txtNombreEmpresa = txtNombreEmpresa;
+    }
+
+    public JTextField getTxtNumeroContacto() {
+        return txtNumeroContacto;
+    }
+
+    public void setTxtNumeroContacto(JTextField txtNumeroContacto) {
+        this.txtNumeroContacto = txtNumeroContacto;
+    }        
 
     @SuppressWarnings("unchecked")
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
@@ -240,14 +306,18 @@ public class ComercianteRegistro extends javax.swing.JFrame {
                 }
             }
         } catch (ClassNotFoundException ex) {
-            java.util.logging.Logger.getLogger(ComercianteRegistro.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(RegistrarComerciante.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         } catch (InstantiationException ex) {
-            java.util.logging.Logger.getLogger(ComercianteRegistro.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(RegistrarComerciante.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         } catch (IllegalAccessException ex) {
-            java.util.logging.Logger.getLogger(ComercianteRegistro.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(RegistrarComerciante.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         } catch (javax.swing.UnsupportedLookAndFeelException ex) {
-            java.util.logging.Logger.getLogger(ComercianteRegistro.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(RegistrarComerciante.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         }
+        //</editor-fold>
+        //</editor-fold>
+        //</editor-fold>
+        //</editor-fold>
         //</editor-fold>
         //</editor-fold>
         //</editor-fold>
@@ -256,7 +326,7 @@ public class ComercianteRegistro extends javax.swing.JFrame {
         /* Create and display the form */
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
-                new ComercianteRegistro().setVisible(true);
+                new RegistrarComerciante().setVisible(true);
             }
         });
     }

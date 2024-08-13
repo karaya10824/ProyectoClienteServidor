@@ -6,7 +6,7 @@ public class Pedidos {
     public Double precio_descuento;
     public Double subtotal;
     public Productos productosSeleccionados;
-    public Double precioFinal;
+    public Double precioNeto;
     public String reseña;
     public boolean estado;
     

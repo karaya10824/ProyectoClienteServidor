@@ -1,6 +1,5 @@
 package Clases;
 
-import Vistas.menuComerciante;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
@@ -9,6 +8,8 @@ import java.sql.SQLException;
 import javax.swing.JOptionPane;
 
 public class Comerciantes {
+    public String correoElectronico;
+    public String contrasena;
     public String nombre_empresa;
     public String descripcion_empresa;
     public String direccion_empresa;
@@ -16,13 +17,31 @@ public class Comerciantes {
 
     public Comerciantes() {}
     
-    public Comerciantes(String nombre_empresa, String descripcion_empresa, String direccion_empresa, String contacto) {
+    public Comerciantes(String correoElectronico, String contrasena, String nombre_empresa, String descripcion_empresa, String direccion_empresa, String contacto) {
+        this.correoElectronico = correoElectronico;
+        this.contrasena = contrasena;
         this.nombre_empresa = nombre_empresa;
         this.descripcion_empresa = descripcion_empresa;
         this.direccion_empresa = direccion_empresa;
         this.contacto = contacto;
     }
 
+    public String getCorreoElectronico() {
+        return correoElectronico;
+    }
+
+    public void setCorreoElectronico(String correoElectronico) {
+        this.correoElectronico = correoElectronico;
+    }
+
+    public String getContrasena() {
+        return contrasena;
+    }
+
+    public void setContrasena(String contrasena) {
+        this.contrasena = contrasena;
+    }
+    
     public String getNombre_empresa() {
         return nombre_empresa;
     }

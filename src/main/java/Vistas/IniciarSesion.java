@@ -2,6 +2,7 @@ package Vistas;
 
 import Clases.ComercianteNoEncontrado;
 import Clases.Comerciantes;
+import Controlador.ControladorComerciante;
 import java.awt.Color;
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -201,8 +202,8 @@ public class IniciarSesion extends javax.swing.JFrame {
             
             if(correoIngresado.equals(correoEncontrado)){
                 if(contrasenaIngresado.equals(contrasenaEncontrado)){
-                    menuComerciante mc = new menuComerciante(idEncontrado);
-                    mc.setVisible(true);
+                    ControladorComerciante mc = new ControladorComerciante(idEncontrado);
+                    mc.mostrarVentanaComerciante();
                     System.out.print("Id: " + idEncontrado + "/nCorreo: " + correoEncontrado + "\n Contraseña: " + contrasenaEncontrado);
                 }else{
                     throw new ComercianteNoEncontrado("Correo eléctrónico o contraseña inválidos");
@@ -228,7 +229,7 @@ public class IniciarSesion extends javax.swing.JFrame {
     }//GEN-LAST:event_btnIrARegistroMouseExited
 
     private void btnIrARegistroActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnIrARegistroActionPerformed
-        ComercianteRegistro rc = new ComercianteRegistro();
+        RegistrarComerciante rc = new RegistrarComerciante();
         rc.setVisible(true);
     }//GEN-LAST:event_btnIrARegistroActionPerformed
 

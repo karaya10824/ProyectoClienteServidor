@@ -1,5 +1,6 @@
 package Vistas;
 
+import Clases.ComerciantesDAO;
 import Clases.Productos;
 import javax.swing.JOptionPane;
 
@@ -89,7 +90,7 @@ public class ClientesBuscarProducto extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void btnBuscarProductoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnBuscarProductoActionPerformed
-        Productos np = new Productos();        
+        ComerciantesDAO np = new ComerciantesDAO();         
         Productos productoEncontrado = np.ClientesdevolverProductos(txtBuscarProducto.getText());        
         
         
