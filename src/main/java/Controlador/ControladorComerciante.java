@@ -4,6 +4,7 @@ import Clases.Comerciantes;
 import Clases.ComerciantesDAO;
 import Clases.ProductoNoEncontrado;
 import Clases.Productos;
+import static Controlador.ControladorMenuPrincipal.vistaRegistroComerciante;
 import Vistas.ComercianteMenu;
 import Vistas.IniciarSesion;
 import Vistas.RegistrarComerciante;
@@ -11,11 +12,12 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.swing.JOptionPane;
 
 public class ControladorComerciante implements ActionListener{
     public int identificadorUsuario;
-    public static ComercianteMenu vistaComerciante;   
-    public static RegistrarComerciante vistaRegistroComerciante;
+    public static ComercianteMenu vistaComerciante;
+    public static ControladorMenuPrincipal vistaPrincipal;
     
     public static Comerciantes nuevoComerciante;
     public static Productos nuevoProducto;
@@ -25,36 +27,25 @@ public class ControladorComerciante implements ActionListener{
     public ControladorComerciante(int id) {
         this.identificadorUsuario = id;
         vistaComerciante = new ComercianteMenu(id);
-        vistaRegistroComerciante = new RegistrarComerciante();
+        vistaPrincipal = new ControladorMenuPrincipal();
         
         nuevoProducto = new Productos();
-        nuevoComerciante = new Comerciantes();
+        nuevoComerciante = new Comerciantes();                
         
         funciones = new ComerciantesDAO();
+        
+        MiPerfil(id);
         
         vistaComerciante.getBtnAgregarProducto().addActionListener(this);
         vistaComerciante.getBtnEliminar().addActionListener(this);
         vistaComerciante.getBtnBuscarProducto().addActionListener(this);
         vistaComerciante.getBtnEditarProducto().addActionListener(this);
-        vistaRegistroComerciante.getBtnRegistrar().addActionListener(this);
+        vistaComerciante.getBtnCerrarSesion().addActionListener(this);
     }    
     
-    public void mostrarVentanaComerciante(){   
+    public static void mostrarVentanaComerciante(){   
         vistaComerciante.setVisible(true);
     }    
-    
-    public void iniciarSesion(){}
-    
-    public void RegistrarComerciante(){
-        nuevoComerciante.setCorreoElectronico(vistaRegistroComerciante.getTxtCorreoComerciante().getText());
-        nuevoComerciante.setContrasena(vistaRegistroComerciante.getTxtContrasena().getText());
-        nuevoComerciante.setNombre_empresa(vistaRegistroComerciante.getTxtNombreEmpresa().getText());
-        nuevoComerciante.setDescripcion_empresa(vistaRegistroComerciante.getTxtDescripcion().getText());
-        nuevoComerciante.setDireccion_empresa(vistaRegistroComerciante.getTxtDireccionComercio().getText());
-        nuevoComerciante.setContacto(vistaRegistroComerciante.getTxtNumeroContacto().getText());
-        funciones.registrarUsuarios(nuevoComerciante);
-        vaciarEspacios();
-    }
     
     public void AgregarProducto(){
         int precio = (Integer) vistaComerciante.getSpinnerAgregarPrecio().getValue();
@@ -66,6 +57,7 @@ public class ControladorComerciante implements ActionListener{
         nuevoProducto.setId(identificadorUsuario);
         
         funciones.agregarProducto(nuevoProducto); 
+        vistaComerciante.setDatos();
         vaciarEspacios();
     }
     
@@ -90,7 +82,8 @@ public class ControladorComerciante implements ActionListener{
         nuevoProducto.setPrecio(precio);
         nuevoProducto.setCategoria_producto(vistaComerciante.getTxtEditarCategoria().getText());
         
-        funciones.editarProducto(nuevoProducto, productoOriginal); 
+        funciones.editarProducto(nuevoProducto, productoOriginal);
+        vistaComerciante.setDatos();
     }
     
     public void EliminarProducto(){
@@ -99,6 +92,7 @@ public class ControladorComerciante implements ActionListener{
         
         try {
             funciones.eliminarProducto(buscarProducto);
+            vistaComerciante.setDatos();
         } catch (ProductoNoEncontrado ex) {
             System.out.print(ex);
         }
@@ -106,9 +100,14 @@ public class ControladorComerciante implements ActionListener{
     
     public void GestionarPedidos(){}
     
-    public static void MiPerfil(){
-    
-    
+    public void MiPerfil(int id){        
+        Comerciantes comercianteEncontrado = funciones.mostrarInformacion(id);
+        
+        vistaComerciante.setTxtNombreEmpresa(comercianteEncontrado.getNombre_empresa());
+        vistaComerciante.setTxtCorreoElectronico(comercianteEncontrado.getCorreoElectronico());
+        vistaComerciante.setTxtDescripcion(comercianteEncontrado.getDescripcion_empresa());
+        vistaComerciante.setTxtContacto(comercianteEncontrado.getContacto());
+        vistaComerciante.setTxtDireccionEmpresa(comercianteEncontrado.getDireccion_empresa());                        
     }
     
     public void vaciarEspacios(){
@@ -116,19 +115,16 @@ public class ControladorComerciante implements ActionListener{
         vistaComerciante.getTxtAgregarCategoria().setText("");
         vistaComerciante.getSpinnerAgregarPrecio().setValue(0);
         vistaComerciante.getTxtAgregarDescripcion().setText("");
-        vistaRegistroComerciante.getTxtCorreoComerciante().setText("");
-        vistaRegistroComerciante.getTxtContrasena().setText("");
-        vistaRegistroComerciante.getTxtNombreEmpresa().setText("");
-        vistaRegistroComerciante.getTxtDescripcion().setText("");
-        vistaRegistroComerciante.getTxtDireccionComercio().setText("");
-        vistaRegistroComerciante.getTxtNumeroContacto().setText("");
+    }
+    
+    public void cerrarSesion(){
+        vistaPrincipal.mostrarVentanaMenuPrincipal();
+        JOptionPane.showMessageDialog(null, "Sesión Cerrada");
+        vistaComerciante.dispose();    
     }
     
     @Override
     public void actionPerformed(ActionEvent e) {
-        if(e.getSource() == vistaRegistroComerciante.getBtnRegistrar()){
-            RegistrarComerciante();        
-        }
         if(e.getSource() == vistaComerciante.getBtnAgregarProducto()){
             AgregarProducto();
         }
@@ -141,11 +137,14 @@ public class ControladorComerciante implements ActionListener{
         if(e.getSource() == vistaComerciante.getBtnEditarProducto()){
             EditarProducto();
         }
-        if(e.getSource() == vistaComerciante.getBtnEditarProducto()){
+        if(e.getSource() == vistaComerciante.getBtnModificarContacto()){
             EditarProducto();
         }
-        if(e.getSource() == vistaComerciante.getBtnEditarProducto()){
+        if(e.getSource() == vistaComerciante.getBtnModificarDevolu()){
             EditarProducto();
+        }
+        if(e.getSource() == vistaComerciante.getBtnCerrarSesion()){
+            cerrarSesion();
         }
     }
 }
