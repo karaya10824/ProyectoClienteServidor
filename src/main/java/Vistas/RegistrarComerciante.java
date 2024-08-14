@@ -242,39 +242,15 @@ public class RegistrarComerciante extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void btnRegistrarMouseEntered(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_btnRegistrarMouseEntered
-        // TODO add your handling code here:
-        btnRegistrar.setBackground(Color.GREEN);
+
     }//GEN-LAST:event_btnRegistrarMouseEntered
 
     private void btnRegistrarMouseExited(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_btnRegistrarMouseExited
-        // TODO add your handling code here:
-        btnRegistrar.setBackground(Color.WHITE);
+
     }//GEN-LAST:event_btnRegistrarMouseExited
 
     private void btnRegistrarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnRegistrarActionPerformed
-        try {
-            //Conexión con la base de datos
-            Connection nuevaConexion = DriverManager.getConnection("jdbc:mysql://localhost/proyectoClienteServidor?serverTimezone=UTC", "root", "Ar4y4.24");
-            //Comando
-            String comandoInsert = "insert into proyectoClienteServidor.comerciantes (correoElectronico, contrasena, nombreEmpresa, descripcion, direccionComercio, NumeroContacto) values (?,?,?,?,?,?)";
-            PreparedStatement comandoInsertPreparado = nuevaConexion.prepareStatement(comandoInsert);
-            
-            //Definimos los parametros
-            comandoInsertPreparado.setString(1, txtCorreoComerciante.getText());
-            comandoInsertPreparado.setString(2, txtContrasena.getText());
-            comandoInsertPreparado.setString(3, txtNombreEmpresa.getText());
-            comandoInsertPreparado.setString(4, txtDescripcion.getText());
-            comandoInsertPreparado.setString(5, txtDireccionComercio.getText());
-            comandoInsertPreparado.setString(6, txtNumeroContacto.getText());
-            
-            //Ejecutamos el comando
-            comandoInsertPreparado.executeUpdate();
-            
-            //Mensaje final
-            System.out.print("Se ha ingresado el registro correctamente");
-        } catch (Exception ex) {
-            System.out.print("Error: " + ex.getMessage());
-        }
+
     }//GEN-LAST:event_btnRegistrarActionPerformed
 
     private void btnCerrarMouseEntered(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_btnCerrarMouseEntered

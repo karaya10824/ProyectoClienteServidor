@@ -11,13 +11,57 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.swing.JButton;
 import javax.swing.JOptionPane;
+import javax.swing.JTextField;
 
 public class IniciarSesion extends javax.swing.JFrame {
     public IniciarSesion() {
         initComponents();
     }
 
+    public JButton getBtnCliente() {
+        return btnCliente;
+    }
+
+    public void setBtnCliente(JButton btnCliente) {
+        this.btnCliente = btnCliente;
+    }
+
+    public JButton getBtnIniciarSesion() {
+        return btnIniciarSesion;
+    }
+
+    public void setBtnIniciarSesion(JButton btnIniciarSesion) {
+        this.btnIniciarSesion = btnIniciarSesion;
+    }
+
+    public JButton getBtnIrARegistro() {
+        return btnIrARegistro;
+    }
+
+    public void setBtnIrARegistro(JButton btnIrARegistro) {
+        this.btnIrARegistro = btnIrARegistro;
+    }
+
+    public JTextField getTxtContrasena() {
+        return txtContrasena;
+    }
+
+    public void setTxtContrasena(JTextField txtContrasena) {
+        this.txtContrasena = txtContrasena;
+    }
+
+    public JTextField getTxtCorreoElectronico() {
+        return txtCorreoElectronico;
+    }
+
+    public void setTxtCorreoElectronico(JTextField txtCorreoElectronico) {
+        this.txtCorreoElectronico = txtCorreoElectronico;
+    }
+
+    
+    
     @SuppressWarnings("unchecked")
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
@@ -46,11 +90,6 @@ public class IniciarSesion extends javax.swing.JFrame {
                 btnIniciarSesionMouseExited(evt);
             }
         });
-        btnIniciarSesion.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnIniciarSesionActionPerformed(evt);
-            }
-        });
 
         jLabel1.setFont(new java.awt.Font("Helvetica Neue", 1, 13)); // NOI18N
         jLabel1.setText("Menú de Inicio de Sesión para Comerciante");
@@ -62,11 +101,6 @@ public class IniciarSesion extends javax.swing.JFrame {
         lblDescripcion.setText("Contraseña:");
 
         btnCliente.setText("Soy un Cliente");
-        btnCliente.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnClienteActionPerformed(evt);
-            }
-        });
 
         jLabel2.setText("¿Aún no tienes una cuenta como comerciante?");
 
@@ -78,11 +112,6 @@ public class IniciarSesion extends javax.swing.JFrame {
             }
             public void mouseExited(java.awt.event.MouseEvent evt) {
                 btnIrARegistroMouseExited(evt);
-            }
-        });
-        btnIrARegistro.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnIrARegistroActionPerformed(evt);
             }
         });
 
@@ -174,52 +203,6 @@ public class IniciarSesion extends javax.swing.JFrame {
         
     }//GEN-LAST:event_btnIniciarSesionMouseExited
 
-    private void btnIniciarSesionActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnIniciarSesionActionPerformed
-        String correoIngresado = txtCorreoElectronico.getText();
-        String contrasenaIngresado = txtContrasena.getText();        
-        String correoEncontrado = "";
-        String contrasenaEncontrado = "";
-        int idEncontrado = 0;
-        
-        try {
-            //Conexión con la base de datos
-            Connection nuevaConexion = DriverManager.getConnection("jdbc:mysql://localhost/proyectoClienteServidor?serverTimezone=UTC", "root", "Ar4y4.24");
-            
-            //Comando
-            String comandoSelect = "SELECT * FROM proyectoClienteServidor.comerciantes WHERE correoElectronico = ?";
-            PreparedStatement comandoSelectPreparado = nuevaConexion.prepareStatement(comandoSelect);
-        
-            //Definimos los parametros
-            comandoSelectPreparado.setString(1, correoIngresado);
-            
-            ResultSet datos = comandoSelectPreparado.executeQuery();
-            
-            while(datos.next()){
-                idEncontrado = datos.getInt("id");
-                correoEncontrado = datos.getString("correoElectronico");
-                contrasenaEncontrado = datos.getString("contrasena");            
-            }//else{
-            
-            if(correoIngresado.equals(correoEncontrado)){
-                if(contrasenaIngresado.equals(contrasenaEncontrado)){
-                    ControladorComerciante mc = new ControladorComerciante(idEncontrado);
-                    mc.mostrarVentanaComerciante();
-                    System.out.print("Id: " + idEncontrado + "/nCorreo: " + correoEncontrado + "\n Contraseña: " + contrasenaEncontrado);
-                }else{
-                    throw new ComercianteNoEncontrado("Correo eléctrónico o contraseña inválidos");
-                }
-            }else{
-                throw new ComercianteNoEncontrado("Correo eléctrónico o contraseña inválidos");
-            }            
-            //}
-        } catch (SQLException ex) {
-            System.out.print("Error: " + ex.getMessage());
-        }  catch (ComercianteNoEncontrado ex) {
-            Logger.getLogger(IniciarSesion.class.getName()).log(Level.SEVERE, null, ex);
-        }                   
-       
-    }//GEN-LAST:event_btnIniciarSesionActionPerformed
-
     private void btnIrARegistroMouseEntered(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_btnIrARegistroMouseEntered
         // TODO add your handling code here:
     }//GEN-LAST:event_btnIrARegistroMouseEntered
@@ -227,17 +210,6 @@ public class IniciarSesion extends javax.swing.JFrame {
     private void btnIrARegistroMouseExited(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_btnIrARegistroMouseExited
         // TODO add your handling code here:
     }//GEN-LAST:event_btnIrARegistroMouseExited
-
-    private void btnIrARegistroActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnIrARegistroActionPerformed
-        RegistrarComerciante rc = new RegistrarComerciante();
-        rc.setVisible(true);
-    }//GEN-LAST:event_btnIrARegistroActionPerformed
-
-    private void btnClienteActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnClienteActionPerformed
-        menuClientes mc = new menuClientes();
-        mc.setVisible(true);
-        this.dispose();
-    }//GEN-LAST:event_btnClienteActionPerformed
 
     /**
      * @param args the command line arguments

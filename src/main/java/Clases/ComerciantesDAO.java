@@ -1,5 +1,7 @@
 package Clases;
 
+import Controlador.ControladorComerciante;
+import Vistas.IniciarSesion;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
@@ -7,7 +9,9 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.sql.Connection;
+import java.sql.DriverManager;
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.logging.Level;
@@ -16,7 +20,8 @@ import javax.swing.JOptionPane;
 
 public class ComerciantesDAO {    
     ArrayList<Productos> productosColeccion = new ArrayList<Productos>();
-    
+
+    public ComerciantesDAO() {}       
     
     //Método para guardar los productos de la colección
     public void Serializar(){
@@ -142,6 +147,39 @@ public class ComerciantesDAO {
         return productoEncontrado;
     }
     
+    //Método para mostrar la información del comerciante
+    public Comerciantes mostrarInformacion(int identificadorUsuario){ 
+        Comerciantes NuevoComerciante = new Comerciantes();
+        
+        try {
+            //Conexión con la base de datos
+            Connection nuevaConexion = ConexionBD.Conexion();
+            
+            //Comando
+            String comandoSelect = "SELECT * FROM proyectoClienteServidor.comerciantes WHERE id = " + identificadorUsuario;
+            PreparedStatement comandoSelectPreparado = nuevaConexion.prepareStatement(comandoSelect);
+        
+            //Definimos los parametros
+            
+            ResultSet datos = comandoSelectPreparado.executeQuery();
+            
+            while(datos.next()){
+                NuevoComerciante.setCorreoElectronico(datos.getString("correoElectronico"));          
+                NuevoComerciante.setNombre_empresa(datos.getString("nombreEmpresa"));
+                NuevoComerciante.setDescripcion_empresa(datos.getString("descripcion"));
+                NuevoComerciante.setDireccion_empresa(datos.getString("direccionComercio"));
+                NuevoComerciante.setContacto(datos.getString("NumeroContacto"));                 
+            }   
+            System.out.print(NuevoComerciante.getNombre_empresa());
+            return NuevoComerciante;
+        }catch (SQLException ex) {
+            Logger.getLogger(ConexionBD.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        
+        return NuevoComerciante;
+    }
+    
+    //Método para registrar comerciantes a la base de datos
     public void registrarUsuarios(Comerciantes nuevoComerciante){
         try{
             Connection nuevaConexion = ConexionBD.Conexion();
@@ -161,9 +199,52 @@ public class ComerciantesDAO {
             comandoInsertPreparado.executeUpdate();
 
             //Mensaje final
+            JOptionPane.showMessageDialog(null, "Usuario registrado con éxito, inicie sesión");
             System.out.print("Se ha ingresado el registro correctamente");    
         }catch (SQLException ex) {
             Logger.getLogger(ConexionBD.class.getName()).log(Level.SEVERE, null, ex);
         }
+    }
+    
+    public void iniciarSesion(String correoIngresado, String contrasenaIngresado) throws ComercianteNoEncontrado{
+        String correoEncontrado = "";
+        String contrasenaEncontrado = "";
+        int idEncontrado = 0;
+        
+        try {
+            //Conexión con la base de datos
+            Connection nuevaConexion = ConexionBD.Conexion();
+            
+            //Comando
+            String comandoSelect = "SELECT * FROM proyectoClienteServidor.comerciantes WHERE correoElectronico = ?";
+            PreparedStatement comandoSelectPreparado = nuevaConexion.prepareStatement(comandoSelect);
+        
+            //Definimos los parametros
+            comandoSelectPreparado.setString(1, correoIngresado);
+            
+            ResultSet datos = comandoSelectPreparado.executeQuery();
+            
+            while(datos.next()){
+                idEncontrado = datos.getInt("id");
+                correoEncontrado = datos.getString("correoElectronico");
+                contrasenaEncontrado = datos.getString("contrasena");            
+            }
+            
+            if(correoIngresado.equals(correoEncontrado) && idEncontrado != 0){
+                if(contrasenaIngresado.equals(contrasenaEncontrado) && idEncontrado != 0){
+                    ControladorComerciante mc = new ControladorComerciante(idEncontrado);
+                    mc.mostrarVentanaComerciante();
+                    JOptionPane.showMessageDialog(null, "Bienvenido al sistema");
+                    //System.out.print("Id: " + idEncontrado + "/nCorreo: " + correoEncontrado + "\n Contraseña: " + contrasenaEncontrado);
+                }else{
+                    throw new ComercianteNoEncontrado("Contraseña inválida"); 
+                }
+            }else{
+                throw new ComercianteNoEncontrado("Correo eléctrónico inválido"); 
+            }         
+            //}
+        } catch (SQLException ex) {
+            System.out.print("Error: " + ex.getMessage());
+        }           
     }
 }

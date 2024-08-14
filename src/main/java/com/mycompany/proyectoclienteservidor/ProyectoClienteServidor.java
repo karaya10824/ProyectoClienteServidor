@@ -1,8 +1,6 @@
 package com.mycompany.proyectoclienteservidor;
 
-import Clases.Productos;
-import Controlador.ControladorComerciante;
-import Vistas.IniciarSesion;
+import Controlador.ControladorMenuPrincipal;
 
 /*
 Integrantes:
@@ -15,7 +13,7 @@ Integrantes:
 public class ProyectoClienteServidor {
 
     public static void main(String[] args) {
-        IniciarSesion IS = new IniciarSesion();        
-        IS.setVisible(true);
+        ControladorMenuPrincipal CmP = new ControladorMenuPrincipal();        
+        CmP.mostrarVentanaMenuPrincipal();
     }
 }
