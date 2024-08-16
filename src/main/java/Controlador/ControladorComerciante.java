@@ -4,10 +4,13 @@ import Clases.Comerciantes;
 import Clases.ComerciantesDAO;
 import Clases.ProductoNoEncontrado;
 import Clases.Productos;
+import Clases.Promociones;
 import static Controlador.ControladorMenuPrincipal.vistaRegistroComerciante;
 import Vistas.ComercianteMenu;
 import Vistas.IniciarSesion;
 import Vistas.RegistrarComerciante;
+import Vistas.modificarContacto;
+import Vistas.modificarPoliticas;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.logging.Level;
@@ -18,9 +21,12 @@ public class ControladorComerciante implements ActionListener{
     public int identificadorUsuario;
     public static ComercianteMenu vistaComerciante;
     public static ControladorMenuPrincipal vistaPrincipal;
+    public static modificarContacto vistaContacto;
+    public static modificarPoliticas vistaDireccion;
     
     public static Comerciantes nuevoComerciante;
     public static Productos nuevoProducto;
+    public static Promociones nuevaPromocion;
     
     public ComerciantesDAO funciones;
     
@@ -28,9 +34,12 @@ public class ControladorComerciante implements ActionListener{
         this.identificadorUsuario = id;
         vistaComerciante = new ComercianteMenu(id);
         vistaPrincipal = new ControladorMenuPrincipal();
+        vistaContacto = new modificarContacto();
+        vistaDireccion = new modificarPoliticas();
         
         nuevoProducto = new Productos();
-        nuevoComerciante = new Comerciantes();                
+        nuevoComerciante = new Comerciantes();
+        nuevaPromocion = new Promociones();
         
         funciones = new ComerciantesDAO();
         
@@ -41,6 +50,12 @@ public class ControladorComerciante implements ActionListener{
         vistaComerciante.getBtnBuscarProducto().addActionListener(this);
         vistaComerciante.getBtnEditarProducto().addActionListener(this);
         vistaComerciante.getBtnCerrarSesion().addActionListener(this);
+        vistaComerciante.getBtnCodPromo().addActionListener(this);
+        vistaComerciante.getBtnModificarContacto().addActionListener(this);
+        vistaComerciante.getBtnModificarDevolu().addActionListener(this);       
+        
+        vistaContacto.getBtnEditarContacto().addActionListener(this);
+        vistaDireccion.getBtnEditarDireccion().addActionListener(this);
     }    
     
     public static void mostrarVentanaComerciante(){   
@@ -99,6 +114,31 @@ public class ControladorComerciante implements ActionListener{
     }
     
     public void GestionarPedidos(){}
+        
+    public void modificarContacto(){        
+        String nuevoContacto = vistaContacto.getTxtNuevoContacto().getText();
+        funciones.modificarContacto(nuevoContacto, identificadorUsuario);
+        vistaComerciante.setTxtContacto(nuevoContacto);
+        vistaContacto.dispose();
+    }
+    
+    public void modificarDireccion(){
+        String nuevaDireccion = vistaDireccion.getTxtNuevaDireccion().getText();
+        funciones.modificarDireccion(nuevaDireccion, identificadorUsuario);
+        vistaComerciante.setTxtDireccionEmpresa(nuevaDireccion);
+        vistaDireccion.dispose();    
+    }
+    
+    public void CrearPromociones(){
+        int PorcentajeDescuento = (Integer) vistaComerciante.getSpinnerPorcentajeDescuento().getValue();
+        
+        nuevaPromocion.setId(identificadorUsuario);
+        nuevaPromocion.setCodigoPromocional(vistaComerciante.getTxtCodPromo().getText());
+        nuevaPromocion.setPorcentajeDescuento(PorcentajeDescuento);
+        
+        funciones.CrearPromocion(nuevaPromocion);
+        vistaComerciante.setDatosPromociones();
+    }
     
     public void MiPerfil(int id){        
         Comerciantes comercianteEncontrado = funciones.mostrarInformacion(id);
@@ -119,8 +159,8 @@ public class ControladorComerciante implements ActionListener{
     
     public void cerrarSesion(){
         vistaPrincipal.mostrarVentanaMenuPrincipal();
-        JOptionPane.showMessageDialog(null, "Sesión Cerrada");
-        vistaComerciante.dispose();    
+        vistaComerciante.dispose();   
+        JOptionPane.showMessageDialog(null, "Sesión Cerrada"); 
     }
     
     @Override
@@ -138,13 +178,25 @@ public class ControladorComerciante implements ActionListener{
             EditarProducto();
         }
         if(e.getSource() == vistaComerciante.getBtnModificarContacto()){
-            EditarProducto();
+            vistaContacto.setVisible(true);
         }
         if(e.getSource() == vistaComerciante.getBtnModificarDevolu()){
-            EditarProducto();
+            vistaDireccion.setVisible(true);
         }
         if(e.getSource() == vistaComerciante.getBtnCerrarSesion()){
             cerrarSesion();
         }
+        if(e.getSource() == vistaComerciante.getBtnCodPromo()){
+            CrearPromociones();
+        }
+        
+        //Botones para modificar información del cliente
+        if(e.getSource() == vistaContacto.getBtnEditarContacto()){
+            modificarContacto();
+        }
+        if(e.getSource() == vistaDireccion.getBtnEditarDireccion()){
+            modificarDireccion();
+        }
+        
     }
 }

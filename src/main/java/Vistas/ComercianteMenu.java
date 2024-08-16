@@ -1,6 +1,7 @@
 package Vistas;
 
 import Clases.Productos;
+import Clases.Promociones;
 import java.util.ArrayList;
 import javax.swing.JButton;
 import javax.swing.JLabel;
@@ -17,14 +18,20 @@ public class ComercianteMenu extends javax.swing.JFrame {
     //Variables para mostrar los productos del comerciante
     DefaultTableModel dtmForm = new DefaultTableModel();
     Productos misProductos = new Productos();
+    
+    DefaultTableModel dtmPromociones = new DefaultTableModel();
+    Promociones misPromociones = new Promociones();
 
     public ComercianteMenu(int id) {                
         this.identificadorUsuario = id;
         initComponents();
+        setModeloPromociones();
+        setDatosPromociones();
         setModelo();
         setDatos();
     }
-
+     
+    //Métodos creado para mostrar la vista de productos
     private void setModelo(){
         String[] cabecera = {"ID", "Nombre","Precio","Categoria","Descripción"};
         dtmForm.setColumnIdentifiers(cabecera);
@@ -38,19 +45,50 @@ public class ComercianteMenu extends javax.swing.JFrame {
         
         for(Productos producto : NuevosproductosColeccion){
             if(producto.getId() == identificadorUsuario){
-            datos[0] = producto.getId();
-            datos[1] = producto.getNombre_producto();
-            datos[2] = producto.getPrecio();
-            datos[3] = producto.getCategoria_producto();
-            datos[4] = producto.getDescipcion_producto();
-            dtmForm.addRow(datos);
+                datos[0] = producto.getId();
+                datos[1] = producto.getNombre_producto();
+                datos[2] = producto.getPrecio();
+                datos[3] = producto.getCategoria_producto();
+                datos[4] = producto.getDescipcion_producto();
+                dtmForm.addRow(datos);
             }
         }    
         tblProductos.setModel(dtmForm);
     }   
+    
+    //Métodos creado para mostrar la vista de las promociones
+    private void setModeloPromociones(){
+        String[] cabeceraPromociones = {"ID", "Código Promocional","Porcentaje de Descuento"};
+        dtmPromociones.setColumnIdentifiers(cabeceraPromociones);
+        tblPromociones.setModel(dtmPromociones);
+    }
+    
+    public void setDatosPromociones(){
+        dtmPromociones.setRowCount(0);
+        Object[] datosPromociones = new Object[dtmPromociones.getColumnCount()];
+        ArrayList<Promociones> NuevosPromociones = misPromociones.DesSerializarPromociones();
+        
+        for(Promociones promocion : NuevosPromociones){
+            if(promocion.getId() == identificadorUsuario){
+                datosPromociones[0] = promocion.getId();
+                datosPromociones[1] = promocion.getCodigoPromocional();
+                datosPromociones[2] = promocion.getPorcentajeDescuento();
+                dtmPromociones.addRow(datosPromociones);
+            }
+        }    
+        tblPromociones.setModel(dtmPromociones);
+    }  
 
     public JLabel getTxtContacto() {
         return txtContacto;
+    }
+
+    public JButton getBtnCodPromo() {
+        return btnCodPromo;
+    }
+
+    public void setBtnCodPromo(JButton btnCodPromo) {
+        this.btnCodPromo = btnCodPromo;
     }
 
     public void setTxtContacto(String txtContacto) {
@@ -99,6 +137,14 @@ public class ComercianteMenu extends javax.swing.JFrame {
     
     public int getIdentificadorUsuario() {
         return identificadorUsuario;
+    }
+
+    public JSpinner getSpinnerPorcentajeDescuento() {
+        return spinnerPorcentajeDescuento;
+    }
+
+    public void setSpinnerPorcentajeDescuento(JSpinner spinnerPorcentajeDescuento) {
+        this.spinnerPorcentajeDescuento = spinnerPorcentajeDescuento;
     }
 
     public void setIdentificadorUsuario(int identificadorUsuario) {
@@ -319,6 +365,12 @@ public class ComercianteMenu extends javax.swing.JFrame {
         lblTitulo = new javax.swing.JLabel();
         btnCodPromo = new javax.swing.JButton();
         btnCerrar4 = new javax.swing.JButton();
+        lblCodPromo1 = new javax.swing.JLabel();
+        spinnerPorcentajeDescuento = new javax.swing.JSpinner();
+        lblCodPromo2 = new javax.swing.JLabel();
+        jScrollPane4 = new javax.swing.JScrollPane();
+        tblPromociones = new javax.swing.JTable();
+        jLabel15 = new javax.swing.JLabel();
 
         jLabel2.setText("jLabel2");
 
@@ -353,7 +405,7 @@ public class ComercianteMenu extends javax.swing.JFrame {
             }
         });
 
-        btnModificarDevolu.setText("Modificar Devolución");
+        btnModificarDevolu.setText("Modificar Dirección");
         btnModificarDevolu.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 btnModificarDevoluActionPerformed(evt);
@@ -648,11 +700,7 @@ public class ComercianteMenu extends javax.swing.JFrame {
                             .addGroup(jPanel3Layout.createSequentialGroup()
                                 .addComponent(lblNombre1)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(txtEditarNombre))
-                            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel3Layout.createSequentialGroup()
-                                .addGap(236, 236, 236)
-                                .addComponent(btnEditarProducto)
-                                .addGap(58, 58, 58))))
+                                .addComponent(txtEditarNombre))))
                     .addGroup(jPanel3Layout.createSequentialGroup()
                         .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(lblImagenes1)
@@ -664,8 +712,13 @@ public class ComercianteMenu extends javax.swing.JFrame {
                         .addGap(0, 0, Short.MAX_VALUE)))
                 .addContainerGap())
             .addGroup(jPanel3Layout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(jLabel12)
+                .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(jPanel3Layout.createSequentialGroup()
+                        .addContainerGap()
+                        .addComponent(jLabel12))
+                    .addGroup(jPanel3Layout.createSequentialGroup()
+                        .addGap(297, 297, 297)
+                        .addComponent(btnEditarProducto)))
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         jPanel3Layout.setVerticalGroup(
@@ -693,15 +746,14 @@ public class ComercianteMenu extends javax.swing.JFrame {
                     .addComponent(spinnerEditarPrecio, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(jPanel3Layout.createSequentialGroup()
-                        .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 44, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(43, 43, 43)
-                        .addComponent(btnEditarProducto))
+                    .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 44, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addGroup(jPanel3Layout.createSequentialGroup()
                         .addComponent(lblDescripcion1)
                         .addGap(33, 33, 33)
                         .addComponent(lblImagenes1)))
-                .addContainerGap(93, Short.MAX_VALUE))
+                .addGap(18, 18, 18)
+                .addComponent(btnEditarProducto)
+                .addContainerGap(95, Short.MAX_VALUE))
         );
 
         jTabbedPane1.addTab("Editar Producto", jPanel3);
@@ -803,25 +855,63 @@ public class ComercianteMenu extends javax.swing.JFrame {
             }
         });
 
+        lblCodPromo1.setText("Descuento en porcentaje:");
+
+        spinnerPorcentajeDescuento.setValue(000);
+
+        lblCodPromo2.setText("%");
+
+        tblPromociones.setModel(new javax.swing.table.DefaultTableModel(
+            new Object [][] {
+
+            },
+            new String [] {
+
+            }
+        ));
+        jScrollPane4.setViewportView(tblPromociones);
+
+        jLabel15.setFont(new java.awt.Font("Helvetica Neue", 1, 14)); // NOI18N
+        jLabel15.setText("Mis Promociones:");
+
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
         jPanel1Layout.setHorizontalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel1Layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(lblCodPromo)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(txtCodPromo, javax.swing.GroupLayout.PREFERRED_SIZE, 176, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(407, Short.MAX_VALUE))
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
+                        .addGap(0, 0, Short.MAX_VALUE)
+                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                            .addGroup(jPanel1Layout.createSequentialGroup()
+                                .addComponent(btnCodPromo)
+                                .addGap(26, 26, 26)
+                                .addComponent(btnCerrar4))
+                            .addComponent(lblTitulo))
+                        .addGap(226, 226, 226))
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
+                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                            .addGroup(jPanel1Layout.createSequentialGroup()
+                                .addGap(0, 171, Short.MAX_VALUE)
+                                .addComponent(jScrollPane4, javax.swing.GroupLayout.PREFERRED_SIZE, 375, javax.swing.GroupLayout.PREFERRED_SIZE))
+                            .addGroup(jPanel1Layout.createSequentialGroup()
+                                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                                    .addGroup(javax.swing.GroupLayout.Alignment.LEADING, jPanel1Layout.createSequentialGroup()
+                                        .addComponent(lblCodPromo)
+                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                        .addComponent(txtCodPromo))
+                                    .addGroup(javax.swing.GroupLayout.Alignment.LEADING, jPanel1Layout.createSequentialGroup()
+                                        .addComponent(lblCodPromo1)
+                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                        .addComponent(spinnerPorcentajeDescuento)))
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(lblCodPromo2)))
+                        .addGap(169, 169, 169))))
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addGroup(jPanel1Layout.createSequentialGroup()
-                        .addComponent(btnCodPromo)
-                        .addGap(26, 26, 26)
-                        .addComponent(btnCerrar4))
-                    .addComponent(lblTitulo))
-                .addGap(226, 226, 226))
+                .addComponent(jLabel15)
+                .addGap(295, 295, 295))
         );
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -832,11 +922,20 @@ public class ComercianteMenu extends javax.swing.JFrame {
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(lblCodPromo)
                     .addComponent(txtCodPromo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(56, 56, 56)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(lblCodPromo1)
+                    .addComponent(spinnerPorcentajeDescuento, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(lblCodPromo2))
+                .addGap(21, 21, 21)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(btnCodPromo)
                     .addComponent(btnCerrar4))
-                .addContainerGap(290, Short.MAX_VALUE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jLabel15)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jScrollPane4, javax.swing.GroupLayout.PREFERRED_SIZE, 222, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(38, Short.MAX_VALUE))
         );
 
         jTabbedPane1.addTab("Crear Promociones", jPanel1);
@@ -955,6 +1054,7 @@ public class ComercianteMenu extends javax.swing.JFrame {
     private javax.swing.JLabel jLabel12;
     private javax.swing.JLabel jLabel13;
     private javax.swing.JLabel jLabel14;
+    private javax.swing.JLabel jLabel15;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;
@@ -972,10 +1072,13 @@ public class ComercianteMenu extends javax.swing.JFrame {
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JScrollPane jScrollPane3;
+    private javax.swing.JScrollPane jScrollPane4;
     private javax.swing.JTabbedPane jTabbedPane1;
     private javax.swing.JLabel lblCategoria;
     private javax.swing.JLabel lblCategoria1;
     private javax.swing.JLabel lblCodPromo;
+    private javax.swing.JLabel lblCodPromo1;
+    private javax.swing.JLabel lblCodPromo2;
     private javax.swing.JLabel lblDescripcion;
     private javax.swing.JLabel lblDescripcion1;
     private javax.swing.JLabel lblImagenes;
@@ -989,7 +1092,9 @@ public class ComercianteMenu extends javax.swing.JFrame {
     private javax.swing.JLabel lblTituloDos1;
     private javax.swing.JSpinner spinnerAgregarPrecio;
     private javax.swing.JSpinner spinnerEditarPrecio;
+    private javax.swing.JSpinner spinnerPorcentajeDescuento;
     private javax.swing.JTable tblProductos;
+    private javax.swing.JTable tblPromociones;
     private javax.swing.JTextField txtAgregarCategoria;
     private javax.swing.JTextArea txtAgregarDescripcion;
     private javax.swing.JTextField txtAgregarNombre;

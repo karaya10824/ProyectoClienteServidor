@@ -5,6 +5,7 @@ import Clases.Comerciantes;
 import Clases.ComerciantesDAO;
 import static Controlador.ControladorComerciante.nuevoComerciante;
 import static Controlador.ControladorComerciante.vistaComerciante;
+import Vistas.ClienteMenu;
 import Vistas.IniciarSesion;
 import Vistas.ComercianteMenu;
 import Vistas.RegistrarComerciante;
@@ -14,11 +15,12 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public class ControladorMenuPrincipal implements ActionListener{
-    public IniciarSesion vistaPrincipal;
     public ComerciantesDAO funciones;
     public Comerciantes nuevocomerciante;
     
+    public static IniciarSesion vistaPrincipal;
     public static RegistrarComerciante vistaRegistroComerciante;
+    public static ClienteMenu vistaCliente;
     
     
     public ControladorMenuPrincipal(){
@@ -26,7 +28,7 @@ public class ControladorMenuPrincipal implements ActionListener{
         funciones = new ComerciantesDAO();
         nuevocomerciante = new Comerciantes();
         vistaRegistroComerciante = new RegistrarComerciante();
-        
+        vistaCliente = new ClienteMenu();     
         vistaRegistroComerciante.getBtnRegistrar().addActionListener(this);
         
         vistaPrincipal.getBtnIniciarSesion().addActionListener(this);
@@ -72,13 +74,14 @@ public class ControladorMenuPrincipal implements ActionListener{
                 iniciarSesion();
                 vistaPrincipal.dispose();
             } catch (ComercianteNoEncontrado ex) {
-                Logger.getLogger(ControladorMenuPrincipal.class.getName()).log(Level.SEVERE, null, ex);
+                System.out.print("No fue posible iniciar sesión \n");
             }
         }
                    
         //Método para iniciar sesión al presionar el botón
         if(e.getSource() == vistaPrincipal.getBtnCliente()){
-            irComoCliente();
+            vistaCliente.setVisible(true);
+            vistaPrincipal.dispose();
         }
         
         //Método para registrar un comerciante al presionar el botón

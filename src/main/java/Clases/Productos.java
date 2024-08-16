@@ -85,7 +85,7 @@ public class Productos implements Serializable{
             fileEntrada.close();
             VDesSerializador.close();
         } catch (Exception ex) {
-            System.out.println("Exception: "+ ex.getMessage());
+            System.out.println(" Exception: "+ ex.getMessage());
         }
         return productosColeccion;  
     }

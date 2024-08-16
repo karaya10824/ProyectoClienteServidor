@@ -20,6 +20,7 @@ import javax.swing.JOptionPane;
 
 public class ComerciantesDAO {    
     ArrayList<Productos> productosColeccion = new ArrayList<Productos>();
+    ArrayList<Promociones> promociones = new ArrayList<Promociones>();
 
     public ComerciantesDAO() {}       
     
@@ -57,6 +58,42 @@ public class ComerciantesDAO {
             System.out.println("Exception: "+ ex.getMessage());
         }
         return productosColeccion;  
+    }
+    
+    //Método para guardar los productos de la colección
+    public void SerializarPromociones(){
+        try(                
+            FileOutputStream fileSalida = new FileOutputStream("promociones.bd");
+            ObjectOutputStream Vserializador = new ObjectOutputStream(fileSalida);){
+            
+            Vserializador.writeObject(promociones);
+            
+            for (Promociones promocion : promociones){
+                System.out.print("ID: "+ promocion.getId() + "Promoción: " + promocion.getCodigoPromocional() + "\n");
+            }
+            
+            fileSalida.close();
+            Vserializador.close();
+        } catch (FileNotFoundException ex) {
+            System.out.print(ex);
+        } catch (IOException i) {
+            System.out.print(i);
+        }
+    }
+    
+    //Método para obtener los productos de la colección
+    public ArrayList<Promociones> DesSerializarPromociones(){
+        try {                   
+            FileInputStream fileEntrada = new FileInputStream("promociones.bd");
+            ObjectInputStream VDesSerializador = new ObjectInputStream(fileEntrada);  
+            
+            promociones = (ArrayList) VDesSerializador.readObject();                           
+            fileEntrada.close();
+            VDesSerializador.close();
+        } catch (Exception ex) {
+            System.out.println(" Exception: "+ ex.getMessage());
+        }
+        return promociones;  
     }
     
     //Método para agregar productos a la colección
@@ -206,6 +243,7 @@ public class ComerciantesDAO {
         }
     }
     
+    ////Método para que los comerciantes inicien sesión
     public void iniciarSesion(String correoIngresado, String contrasenaIngresado) throws ComercianteNoEncontrado{
         String correoEncontrado = "";
         String contrasenaEncontrado = "";
@@ -230,7 +268,7 @@ public class ComerciantesDAO {
                 contrasenaEncontrado = datos.getString("contrasena");            
             }
             
-            if(correoIngresado.equals(correoEncontrado) && idEncontrado != 0){
+            if(correoIngresado.equals(correoEncontrado) && correoIngresado.isBlank() == false){
                 if(contrasenaIngresado.equals(contrasenaEncontrado) && idEncontrado != 0){
                     ControladorComerciante mc = new ControladorComerciante(idEncontrado);
                     mc.mostrarVentanaComerciante();
@@ -246,5 +284,40 @@ public class ComerciantesDAO {
         } catch (SQLException ex) {
             System.out.print("Error: " + ex.getMessage());
         }           
+    }
+    
+    public void CrearPromocion(Promociones nuevaPromocion){
+        DesSerializarPromociones();
+        promociones.add(nuevaPromocion);
+        JOptionPane.showMessageDialog(null, "Promoción " + nuevaPromocion.getCodigoPromocional() + " fue agregado con éxito");
+        SerializarPromociones();
+    }
+        
+    public void modificarContacto(String nuevoContacto, int id){
+        try{
+            Connection nuevaConexion = ConexionBD.Conexion();
+
+            String comandoInsert = "update proyectoClienteServidor.comerciantes set NumeroContacto = ? where id = ?";
+            PreparedStatement comandoInsertPreparado = nuevaConexion.prepareStatement(comandoInsert);
+
+            //Definimos los parametros
+            comandoInsertPreparado.setString(1, nuevoContacto);
+            comandoInsertPreparado.setInt(2, id);
+
+            //Ejecutamos el comando
+            comandoInsertPreparado.executeUpdate();
+
+            //Mensaje final
+            JOptionPane.showMessageDialog(null, "Número de contacto actualizado con éxito");
+            System.out.print("Se ha ingresado el registro correctamente");    
+        }catch (SQLException ex) {
+            Logger.getLogger(ConexionBD.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    
+    }
+    
+    public void modificarDireccion(String nuevoContacto, int id){
+    
+        
     }
 }

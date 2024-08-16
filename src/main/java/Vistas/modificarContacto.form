@@ -38,13 +38,13 @@
                       <Group type="103" groupAlignment="1" attributes="0">
                           <Group type="102" attributes="0">
                               <EmptySpace min="-2" pref="18" max="-2" attributes="0"/>
-                              <Component id="btnEditarProducto" min="-2" max="-2" attributes="0"/>
+                              <Component id="btnEditarContacto" min="-2" max="-2" attributes="0"/>
                               <EmptySpace min="-2" pref="26" max="-2" attributes="0"/>
-                              <Component id="btnCerrar1" min="-2" max="-2" attributes="0"/>
+                              <Component id="btnCerrar" min="-2" max="-2" attributes="0"/>
                           </Group>
                           <Group type="102" alignment="0" attributes="0">
                               <EmptySpace max="-2" attributes="0"/>
-                              <Component id="jTextField1" min="-2" pref="200" max="-2" attributes="0"/>
+                              <Component id="txtNuevoContacto" min="-2" pref="200" max="-2" attributes="0"/>
                           </Group>
                       </Group>
                   </Group>
@@ -63,12 +63,12 @@
               <EmptySpace type="unrelated" max="-2" attributes="0"/>
               <Group type="103" groupAlignment="3" attributes="0">
                   <Component id="lblDescripcion1" alignment="3" min="-2" max="-2" attributes="0"/>
-                  <Component id="jTextField1" alignment="3" min="-2" max="-2" attributes="0"/>
+                  <Component id="txtNuevoContacto" alignment="3" min="-2" max="-2" attributes="0"/>
               </Group>
               <EmptySpace type="unrelated" min="-2" max="-2" attributes="0"/>
               <Group type="103" groupAlignment="3" attributes="0">
-                  <Component id="btnEditarProducto" alignment="3" min="-2" max="-2" attributes="0"/>
-                  <Component id="btnCerrar1" alignment="3" min="-2" max="-2" attributes="0"/>
+                  <Component id="btnEditarContacto" alignment="3" min="-2" max="-2" attributes="0"/>
+                  <Component id="btnCerrar" alignment="3" min="-2" max="-2" attributes="0"/>
               </Group>
               <EmptySpace pref="31" max="32767" attributes="0"/>
           </Group>
@@ -84,7 +84,7 @@
         <Property name="text" type="java.lang.String" value="Modificar Informaci&#xf3;n de Contacto"/>
       </Properties>
     </Component>
-    <Component class="javax.swing.JButton" name="btnEditarProducto">
+    <Component class="javax.swing.JButton" name="btnEditarContacto">
       <Properties>
         <Property name="text" type="java.lang.String" value="Editar"/>
       </Properties>
@@ -97,12 +97,12 @@
         <Property name="text" type="java.lang.String" value="Men&#xfa; de Inventario | Comerciante"/>
       </Properties>
     </Component>
-    <Component class="javax.swing.JButton" name="btnCerrar1">
+    <Component class="javax.swing.JButton" name="btnCerrar">
       <Properties>
         <Property name="text" type="java.lang.String" value="Cerrar"/>
       </Properties>
       <Events>
-        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="btnCerrar1ActionPerformed"/>
+        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="btnCerrarActionPerformed"/>
       </Events>
     </Component>
     <Component class="javax.swing.JLabel" name="lblDescripcion1">
@@ -110,7 +110,7 @@
         <Property name="text" type="java.lang.String" value="Nuevo Contacto:"/>
       </Properties>
     </Component>
-    <Component class="javax.swing.JTextField" name="jTextField1">
+    <Component class="javax.swing.JTextField" name="txtNuevoContacto">
     </Component>
   </SubComponents>
 </Form>
