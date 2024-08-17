@@ -2,7 +2,8 @@ package Clases;
 
 public class Pedidos {
     public int Numero_pedido;
-    public String codigo_promocional;    
+    public String codigo_promocional;  
+    public int cantidad;
     public Double precio_descuento;
     public Double subtotal;
     public Productos productosSeleccionados;
