@@ -7,31 +7,17 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import javax.swing.JOptionPane;
 
-public class Comerciantes {
-    public String correoElectronico;
+public class Comerciantes extends Usuarios{
     public String contrasena;
     public String nombre_empresa;
     public String descripcion_empresa;
-    public String direccion_empresa;
-    public String contacto;
 
     public Comerciantes() {}
-    
-    public Comerciantes(String correoElectronico, String contrasena, String nombre_empresa, String descripcion_empresa, String direccion_empresa, String contacto) {
-        this.correoElectronico = correoElectronico;
+
+    public Comerciantes(String contrasena, String nombre_empresa, String descripcion_empresa) {
         this.contrasena = contrasena;
         this.nombre_empresa = nombre_empresa;
         this.descripcion_empresa = descripcion_empresa;
-        this.direccion_empresa = direccion_empresa;
-        this.contacto = contacto;
-    }
-
-    public String getCorreoElectronico() {
-        return correoElectronico;
-    }
-
-    public void setCorreoElectronico(String correoElectronico) {
-        this.correoElectronico = correoElectronico;
     }
 
     public String getContrasena() {
@@ -41,7 +27,7 @@ public class Comerciantes {
     public void setContrasena(String contrasena) {
         this.contrasena = contrasena;
     }
-    
+
     public String getNombre_empresa() {
         return nombre_empresa;
     }
@@ -58,64 +44,27 @@ public class Comerciantes {
         this.descripcion_empresa = descripcion_empresa;
     }
 
-    public String getDireccion_empresa() {
-        return direccion_empresa;
+    public String getNumeroTelefonico() {
+        return NumeroTelefonico;
     }
 
-    public void setDireccion_empresa(String direccion_empresa) {
-        this.direccion_empresa = direccion_empresa;
+    public void setNumeroTelefonico(String NumeroTelefonico) {
+        this.NumeroTelefonico = NumeroTelefonico;
     }
 
-    public String getContacto() {
-        return contacto;
+    public String getCorreoElectronico() {
+        return correoElectronico;
     }
 
-    public void setContacto(String contacto) {
-        this.contacto = contacto;
+    public void setCorreoElectronico(String correoElectronico) {
+        this.correoElectronico = correoElectronico;
     }
-    
-    public boolean IniciarSesion(String correoIngresado, String contrasenaIngresado) throws ComercianteNoEncontrado{
-        String correoEncontrado = "";
-        String contrasenaEncontrado = "";
-        int idEncontrado = 0;
-        
-        try {
-            //Conexión con la base de datos
-            Connection nuevaConexion = DriverManager.getConnection("jdbc:mysql://localhost/proyectoClienteServidor?serverTimezone=UTC", "root", "Ar4y4.24");
-            
-            //Comando
-            String comandoSelect = "SELECT * FROM proyectoClienteServidor.comerciantes WHERE correoElectronico = ?";
-            PreparedStatement comandoSelectPreparado = nuevaConexion.prepareStatement(comandoSelect);
-        
-            //Definimos los parametros
-            comandoSelectPreparado.setString(1, correoIngresado);
-            
-            ResultSet datos = comandoSelectPreparado.executeQuery();
-            
-            while(datos.next()){
-                idEncontrado = datos.getInt("id");
-                correoEncontrado = datos.getString("correoElectronico");
-                contrasenaEncontrado = datos.getString("contrasena");            
-            }//else{
-            
-            if(correoIngresado.equals(correoEncontrado)){
-                if(contrasenaIngresado.equals(contrasenaEncontrado)){
-                    System.out.print("Id: " + idEncontrado + "/nCorreo: " + correoEncontrado + "\n Contraseña: " + contrasenaEncontrado);
-                   return true;
-                }else{
-                    throw new ComercianteNoEncontrado("Correo eléctrónico o contraseña inválidos");
-                }
-            }else{
-                throw new ComercianteNoEncontrado("Correo eléctrónico o contraseña inválidos");
-            }            
-            //}
-        } catch (SQLException ex) {
-            System.out.print("Error: " + ex.getMessage());
-            return false;
-        }             
-    } 
-    
-    public void mostrarProductos(){
-    
+
+    public String getDireccion() {
+        return direccion;
     }
+
+    public void setDireccion(String direccion) {
+        this.direccion = direccion;
+    }            
 }

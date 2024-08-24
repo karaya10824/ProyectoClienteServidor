@@ -2,7 +2,7 @@ package Controlador;
 
 import Clases.ComercianteNoEncontrado;
 import Clases.Comerciantes;
-import Clases.ComerciantesDAO;
+import Clases.Servidor;
 import static Controlador.ControladorComerciante.nuevoComerciante;
 import static Controlador.ControladorComerciante.vistaComerciante;
 import Vistas.ClienteMenu;
@@ -15,20 +15,26 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public class ControladorMenuPrincipal implements ActionListener{
-    public ComerciantesDAO funciones;
+    public Servidor servidor;
     public Comerciantes nuevocomerciante;
+    
+    public static ControladorComerciante vistaComerciante;
+    public static ControladorCliente vistaCliente;
     
     public static IniciarSesion vistaPrincipal;
     public static RegistrarComerciante vistaRegistroComerciante;
-    public static ClienteMenu vistaCliente;
+    //public static ClienteMenu vistaCliente;
     
     
     public ControladorMenuPrincipal(){
         vistaPrincipal = new IniciarSesion();
-        funciones = new ComerciantesDAO();
+        servidor = new Servidor();
         nuevocomerciante = new Comerciantes();
+        
         vistaRegistroComerciante = new RegistrarComerciante();
-        vistaCliente = new ClienteMenu();     
+        
+        vistaCliente = new ControladorCliente();  
+        
         vistaRegistroComerciante.getBtnRegistrar().addActionListener(this);
         
         vistaPrincipal.getBtnIniciarSesion().addActionListener(this);
@@ -43,7 +49,7 @@ public class ControladorMenuPrincipal implements ActionListener{
     public void iniciarSesion() throws ComercianteNoEncontrado{
         String correoEncontrado = vistaPrincipal.getTxtCorreoElectronico().getText();
         String contrasenaEncontrado = vistaPrincipal.getTxtContrasena().getText();        
-        funciones.iniciarSesion(correoEncontrado, contrasenaEncontrado);            
+        servidor.iniciarSesion(correoEncontrado, contrasenaEncontrado);            
     }
     
     public void registrarComerciante(){
@@ -51,9 +57,9 @@ public class ControladorMenuPrincipal implements ActionListener{
         nuevocomerciante.setContrasena(vistaRegistroComerciante.getTxtContrasena().getText());
         nuevocomerciante.setNombre_empresa(vistaRegistroComerciante.getTxtNombreEmpresa().getText());
         nuevocomerciante.setDescripcion_empresa(vistaRegistroComerciante.getTxtDescripcion().getText());
-        nuevocomerciante.setDireccion_empresa(vistaRegistroComerciante.getTxtDireccionComercio().getText());
-        nuevocomerciante.setContacto(vistaRegistroComerciante.getTxtNumeroContacto().getText());
-        funciones.registrarUsuarios(nuevocomerciante);
+        nuevocomerciante.setDireccion(vistaRegistroComerciante.getTxtDireccionComercio().getText());
+        nuevocomerciante.setNumeroTelefonico(vistaRegistroComerciante.getTxtNumeroContacto().getText());
+        servidor.registrarUsuarios(nuevocomerciante);
     }
     
     public void irComoCliente(){
@@ -80,7 +86,7 @@ public class ControladorMenuPrincipal implements ActionListener{
                    
         //Método para iniciar sesión al presionar el botón
         if(e.getSource() == vistaPrincipal.getBtnCliente()){
-            vistaCliente.setVisible(true);
+            vistaCliente.mostrarVentanaCliente();
             vistaPrincipal.dispose();
         }
         

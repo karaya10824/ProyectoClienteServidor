@@ -12,6 +12,7 @@ public class Promociones implements Serializable{
     ArrayList<Promociones> promociones = new ArrayList<Promociones>();
     
     public Promociones(){
+        this.porcentajeDescuento = 0;
     }
     
     public Promociones(int id, String codigoPromocional, int porcentajeDescuento) {
@@ -56,5 +57,11 @@ public class Promociones implements Serializable{
             System.out.println(" Exception: "+ ex.getMessage());
         }
         return promociones;  
+    }
+    
+     @Override
+     public boolean equals (Object promocion) {
+        Promociones producto_equal = (Promociones) promocion;
+        return producto_equal.getCodigoPromocional().equals(this.codigoPromocional);
     }
 }

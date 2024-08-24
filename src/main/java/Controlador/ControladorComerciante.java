@@ -1,10 +1,10 @@
 package Controlador;
 
 import Clases.Comerciantes;
-import Clases.ComerciantesDAO;
 import Clases.ProductoNoEncontrado;
 import Clases.Productos;
 import Clases.Promociones;
+import Clases.Servidor;
 import static Controlador.ControladorMenuPrincipal.vistaRegistroComerciante;
 import Vistas.ComercianteMenu;
 import Vistas.IniciarSesion;
@@ -13,14 +13,18 @@ import Vistas.modificarContacto;
 import Vistas.modificarPoliticas;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.IOException;
+import java.io.ObjectOutputStream;
+import java.net.Socket;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JOptionPane;
 
 public class ControladorComerciante implements ActionListener{
     public int identificadorUsuario;
-    public static ComercianteMenu vistaComerciante;
+    public static ComercianteMenu vistaComerciante;    
     public static ControladorMenuPrincipal vistaPrincipal;
+    
     public static modificarContacto vistaContacto;
     public static modificarPoliticas vistaDireccion;
     
@@ -28,7 +32,7 @@ public class ControladorComerciante implements ActionListener{
     public static Productos nuevoProducto;
     public static Promociones nuevaPromocion;
     
-    public ComerciantesDAO funciones;
+    public Servidor servidorPeticiones;
     
     public ControladorComerciante(int id) {
         this.identificadorUsuario = id;
@@ -41,9 +45,11 @@ public class ControladorComerciante implements ActionListener{
         nuevoComerciante = new Comerciantes();
         nuevaPromocion = new Promociones();
         
-        funciones = new ComerciantesDAO();
+        servidorPeticiones = new Servidor();
         
         MiPerfil(id);
+        vistaComerciante.setDatosPedidos(servidorPeticiones.obtenerMisPedidos(id));
+        vistaComerciante.setDatosClientes(servidorPeticiones.obtenerClientes(id));
         
         vistaComerciante.getBtnAgregarProducto().addActionListener(this);
         vistaComerciante.getBtnEliminar().addActionListener(this);
@@ -52,7 +58,8 @@ public class ControladorComerciante implements ActionListener{
         vistaComerciante.getBtnCerrarSesion().addActionListener(this);
         vistaComerciante.getBtnCodPromo().addActionListener(this);
         vistaComerciante.getBtnModificarContacto().addActionListener(this);
-        vistaComerciante.getBtnModificarDevolu().addActionListener(this);       
+        vistaComerciante.getBtnModificarDevolu().addActionListener(this); 
+        vistaComerciante.getBtnActualizarPedidos().addActionListener(this); 
         
         vistaContacto.getBtnEditarContacto().addActionListener(this);
         vistaDireccion.getBtnEditarDireccion().addActionListener(this);
@@ -71,7 +78,7 @@ public class ControladorComerciante implements ActionListener{
         nuevoProducto.setCategoria_producto(vistaComerciante.getTxtAgregarCategoria().getText());
         nuevoProducto.setId(identificadorUsuario);
         
-        funciones.agregarProducto(nuevoProducto); 
+        servidorPeticiones.agregarProducto(nuevoProducto); 
         vistaComerciante.setDatos();
         vaciarEspacios();
     }
@@ -79,7 +86,7 @@ public class ControladorComerciante implements ActionListener{
     public void BuscarProducto(){
         String buscarProducto = vistaComerciante.getTxtBuscarProducto().getText();
         
-        Productos modificarProducto = funciones.devolverProductos(buscarProducto);
+        Productos modificarProducto = servidorPeticiones.devolverProductos(buscarProducto);
         
         vistaComerciante.getTxtEditarNombre().setText(modificarProducto.getNombre_producto());
         vistaComerciante.getTxtEditarCategoria().setText(modificarProducto.getCategoria_producto());
@@ -88,7 +95,7 @@ public class ControladorComerciante implements ActionListener{
     }
     
     public void EditarProducto(){
-        Productos productoOriginal = funciones.devolverProductos(vistaComerciante.getTxtBuscarProducto().getText());
+        Productos productoOriginal = servidorPeticiones.devolverProductos(vistaComerciante.getTxtBuscarProducto().getText());
 
         int precio = (Integer) vistaComerciante.getSpinnerEditarPrecio().getValue();
         
@@ -97,7 +104,7 @@ public class ControladorComerciante implements ActionListener{
         nuevoProducto.setPrecio(precio);
         nuevoProducto.setCategoria_producto(vistaComerciante.getTxtEditarCategoria().getText());
         
-        funciones.editarProducto(nuevoProducto, productoOriginal);
+        servidorPeticiones.editarProducto(nuevoProducto, productoOriginal);
         vistaComerciante.setDatos();
     }
     
@@ -106,7 +113,7 @@ public class ControladorComerciante implements ActionListener{
         String buscarProducto = vistaComerciante.getTxtEliminar().getText();
         
         try {
-            funciones.eliminarProducto(buscarProducto);
+            servidorPeticiones.eliminarProducto(buscarProducto);
             vistaComerciante.setDatos();
         } catch (ProductoNoEncontrado ex) {
             System.out.print(ex);
@@ -115,16 +122,21 @@ public class ControladorComerciante implements ActionListener{
     
     public void GestionarPedidos(){}
         
+    public void actualizarPedidos(){
+        vistaComerciante.setDatosPedidos(servidorPeticiones.obtenerMisPedidos(identificadorUsuario));
+        vistaComerciante.setDatosClientes(servidorPeticiones.obtenerClientes(identificadorUsuario));
+    }
+    
     public void modificarContacto(){        
         String nuevoContacto = vistaContacto.getTxtNuevoContacto().getText();
-        funciones.modificarContacto(nuevoContacto, identificadorUsuario);
+        servidorPeticiones.modificarContacto(nuevoContacto, identificadorUsuario);
         vistaComerciante.setTxtContacto(nuevoContacto);
         vistaContacto.dispose();
     }
     
     public void modificarDireccion(){
         String nuevaDireccion = vistaDireccion.getTxtNuevaDireccion().getText();
-        funciones.modificarDireccion(nuevaDireccion, identificadorUsuario);
+        servidorPeticiones.modificarDireccion(nuevaDireccion, identificadorUsuario);
         vistaComerciante.setTxtDireccionEmpresa(nuevaDireccion);
         vistaDireccion.dispose();    
     }
@@ -136,18 +148,18 @@ public class ControladorComerciante implements ActionListener{
         nuevaPromocion.setCodigoPromocional(vistaComerciante.getTxtCodPromo().getText());
         nuevaPromocion.setPorcentajeDescuento(PorcentajeDescuento);
         
-        funciones.CrearPromocion(nuevaPromocion);
+        servidorPeticiones.CrearPromocion(nuevaPromocion);
         vistaComerciante.setDatosPromociones();
     }
     
     public void MiPerfil(int id){        
-        Comerciantes comercianteEncontrado = funciones.mostrarInformacion(id);
+        Comerciantes comercianteEncontrado = servidorPeticiones.mostrarInformacion(id);
         
         vistaComerciante.setTxtNombreEmpresa(comercianteEncontrado.getNombre_empresa());
         vistaComerciante.setTxtCorreoElectronico(comercianteEncontrado.getCorreoElectronico());
         vistaComerciante.setTxtDescripcion(comercianteEncontrado.getDescripcion_empresa());
-        vistaComerciante.setTxtContacto(comercianteEncontrado.getContacto());
-        vistaComerciante.setTxtDireccionEmpresa(comercianteEncontrado.getDireccion_empresa());                        
+        vistaComerciante.setTxtContacto(comercianteEncontrado.getNumeroTelefonico());
+        vistaComerciante.setTxtDireccionEmpresa(comercianteEncontrado.getDireccion());                        
     }
     
     public void vaciarEspacios(){
@@ -161,6 +173,25 @@ public class ControladorComerciante implements ActionListener{
         vistaPrincipal.mostrarVentanaMenuPrincipal();
         vistaComerciante.dispose();   
         JOptionPane.showMessageDialog(null, "Sesión Cerrada"); 
+    }
+    
+    public void crearCliente(){   
+        Socket vSocketCliente;       
+
+        try{
+            vSocketCliente = new Socket("localhost", 10580);
+   
+            //DataOutputStream vCanal = new DataOutputStream(vSocketCliente.getOutputStream());
+            ObjectOutputStream vSerializador = new ObjectOutputStream(vSocketCliente.getOutputStream());                      
+
+            //Enviamos el evento al servidor
+            //vSerializador.writeObject(nuevoVoto);     
+            
+            //vCanal.close();
+            vSerializador.close();
+        } catch (IOException ex) {
+            System.out.print("s" + ex);
+        }  
     }
     
     @Override
@@ -189,6 +220,9 @@ public class ControladorComerciante implements ActionListener{
         if(e.getSource() == vistaComerciante.getBtnCodPromo()){
             CrearPromociones();
         }
+        if(e.getSource() == vistaComerciante.getBtnActualizarPedidos()){
+            actualizarPedidos();
+        }
         
         //Botones para modificar información del cliente
         if(e.getSource() == vistaContacto.getBtnEditarContacto()){
@@ -196,7 +230,7 @@ public class ControladorComerciante implements ActionListener{
         }
         if(e.getSource() == vistaDireccion.getBtnEditarDireccion()){
             modificarDireccion();
-        }
+        }        
         
     }
 }

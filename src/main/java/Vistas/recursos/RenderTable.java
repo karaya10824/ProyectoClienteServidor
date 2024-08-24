@@ -14,5 +14,4 @@ public class RenderTable extends DefaultTableCellRenderer{
         }
         return super.getTableCellRendererComponent(table, objetoRenderizado, isSelected, hasFocus, row, column); 
     }
-
 }
