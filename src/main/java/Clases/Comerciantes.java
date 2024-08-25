@@ -1,5 +1,6 @@
 package Clases;
 
+import java.io.Serializable;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
@@ -7,7 +8,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import javax.swing.JOptionPane;
 
-public class Comerciantes extends Usuarios{
+public class Comerciantes extends Usuarios implements Serializable{
     public String contrasena;
     public String nombre_empresa;
     public String descripcion_empresa;

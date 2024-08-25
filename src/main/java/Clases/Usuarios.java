@@ -1,6 +1,8 @@
 package Clases;
 
-public class Usuarios {
+import java.io.Serializable;
+
+public class Usuarios implements Serializable{
     //Caracteristicas que comparte los comerciantes y clientes
     public String NumeroTelefonico;
     public String correoElectronico;

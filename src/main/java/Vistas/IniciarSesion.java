@@ -4,6 +4,10 @@ import Clases.ComercianteNoEncontrado;
 import Clases.Comerciantes;
 import Controlador.ControladorComerciante;
 import java.awt.Color;
+import java.io.DataOutputStream;
+import java.io.IOException;
+import java.io.ObjectOutputStream;
+import java.net.Socket;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
@@ -15,9 +19,9 @@ import javax.swing.JButton;
 import javax.swing.JOptionPane;
 import javax.swing.JTextField;
 
-public class IniciarSesion extends javax.swing.JFrame {
-    public IniciarSesion() {
-        initComponents();
+public class IniciarSesion extends javax.swing.JFrame {    
+    public IniciarSesion() {    
+        initComponents();     
     }
 
     public JButton getBtnCliente() {
@@ -88,6 +92,11 @@ public class IniciarSesion extends javax.swing.JFrame {
             }
             public void mouseExited(java.awt.event.MouseEvent evt) {
                 btnIniciarSesionMouseExited(evt);
+            }
+        });
+        btnIniciarSesion.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnIniciarSesionActionPerformed(evt);
             }
         });
 
@@ -210,6 +219,10 @@ public class IniciarSesion extends javax.swing.JFrame {
     private void btnIrARegistroMouseExited(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_btnIrARegistroMouseExited
         // TODO add your handling code here:
     }//GEN-LAST:event_btnIrARegistroMouseExited
+
+    private void btnIniciarSesionActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnIniciarSesionActionPerformed
+
+    }//GEN-LAST:event_btnIniciarSesionActionPerformed
 
     /**
      * @param args the command line arguments

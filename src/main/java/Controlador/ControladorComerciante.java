@@ -1,6 +1,7 @@
 package Controlador;
 
 import Clases.Comerciantes;
+import Clases.Pedidos;
 import Clases.ProductoNoEncontrado;
 import Clases.Productos;
 import Clases.Promociones;
@@ -13,8 +14,10 @@ import Vistas.modificarContacto;
 import Vistas.modificarPoliticas;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.DataInputStream;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
+import java.io.DataOutputStream;
 import java.net.Socket;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -22,7 +25,7 @@ import javax.swing.JOptionPane;
 
 public class ControladorComerciante implements ActionListener{
     public int identificadorUsuario;
-    public static ComercianteMenu vistaComerciante;    
+    public ComercianteMenu vistaComerciante;    
     public static ControladorMenuPrincipal vistaPrincipal;
     
     public static modificarContacto vistaContacto;
@@ -31,10 +34,14 @@ public class ControladorComerciante implements ActionListener{
     public static Comerciantes nuevoComerciante;
     public static Productos nuevoProducto;
     public static Promociones nuevaPromocion;
+    public Pedidos nuevopedido;
     
     public Servidor servidorPeticiones;
+    Socket vSocketCliente;
+    DataOutputStream vCanal;
+    ObjectOutputStream vSerializador;
     
-    public ControladorComerciante(int id) {
+    public ControladorComerciante(int id){
         this.identificadorUsuario = id;
         vistaComerciante = new ComercianteMenu(id);
         vistaPrincipal = new ControladorMenuPrincipal();
@@ -44,9 +51,11 @@ public class ControladorComerciante implements ActionListener{
         nuevoProducto = new Productos();
         nuevoComerciante = new Comerciantes();
         nuevaPromocion = new Promociones();
+        nuevopedido = new Pedidos();
         
         servidorPeticiones = new Servidor();
         
+        vistaComerciante.setDatos();
         MiPerfil(id);
         vistaComerciante.setDatosPedidos(servidorPeticiones.obtenerMisPedidos(id));
         vistaComerciante.setDatosClientes(servidorPeticiones.obtenerClientes(id));
@@ -60,14 +69,30 @@ public class ControladorComerciante implements ActionListener{
         vistaComerciante.getBtnModificarContacto().addActionListener(this);
         vistaComerciante.getBtnModificarDevolu().addActionListener(this); 
         vistaComerciante.getBtnActualizarPedidos().addActionListener(this); 
+        vistaComerciante.getBtnActualizar().addActionListener(this); 
         
         vistaContacto.getBtnEditarContacto().addActionListener(this);
         vistaDireccion.getBtnEditarDireccion().addActionListener(this);
     }    
     
-    public static void mostrarVentanaComerciante(){   
+    public void mostrarVentanaComerciante(){   
         vistaComerciante.setVisible(true);
     }    
+    
+    public void BuscarProducto(){
+        String buscarProducto = vistaComerciante.getTxtBuscarProducto().getText();
+        
+        Productos modificarProducto = servidorPeticiones.devolverProductos(buscarProducto);
+        
+        if(modificarProducto != null){
+            vistaComerciante.getTxtEditarNombre().setText(modificarProducto.getNombre_producto());
+            vistaComerciante.getTxtEditarCategoria().setText(modificarProducto.getCategoria_producto());
+            vistaComerciante.getSpinnerEditarPrecio().setValue(modificarProducto.getPrecio());
+            vistaComerciante.getTxtEditarDescripcion().setText(modificarProducto.getDescipcion_producto()); 
+        }else{
+            JOptionPane.showMessageDialog(null, "Producto no encontrado");
+        }
+    }
     
     public void AgregarProducto(){
         int precio = (Integer) vistaComerciante.getSpinnerAgregarPrecio().getValue();
@@ -76,23 +101,32 @@ public class ControladorComerciante implements ActionListener{
         nuevoProducto.setDescipcion_producto(vistaComerciante.getTxtAgregarDescripcion().getText());
         nuevoProducto.setPrecio(precio);
         nuevoProducto.setCategoria_producto(vistaComerciante.getTxtAgregarCategoria().getText());
-        nuevoProducto.setId(identificadorUsuario);
+        nuevoProducto.setId(identificadorUsuario);               
         
-        servidorPeticiones.agregarProducto(nuevoProducto); 
-        vistaComerciante.setDatos();
+        boolean respuesta = false;
+        
+        try{   
+            vSocketCliente = new Socket("localhost", 10579);
+            vSerializador = new ObjectOutputStream(vSocketCliente.getOutputStream());
+            vCanal = new DataOutputStream(vSocketCliente.getOutputStream());
+            
+            vCanal.writeInt(1);
+            vSerializador.writeObject(nuevoProducto);      
+            DataInputStream vRespuesta = new DataInputStream(vSocketCliente.getInputStream());
+            
+            respuesta = vRespuesta.readBoolean();  
+            vSerializador.close();
+            
+        } catch (IOException ex) {
+            System.out.print("s" + ex);
+        }       
+        
+        if(respuesta == true){
+            JOptionPane.showMessageDialog(null, "El producto " + nuevoProducto.getNombre_producto() + " fue agregado con éxito.");
+        }   
+        
         vaciarEspacios();
-    }
-    
-    public void BuscarProducto(){
-        String buscarProducto = vistaComerciante.getTxtBuscarProducto().getText();
-        
-        Productos modificarProducto = servidorPeticiones.devolverProductos(buscarProducto);
-        
-        vistaComerciante.getTxtEditarNombre().setText(modificarProducto.getNombre_producto());
-        vistaComerciante.getTxtEditarCategoria().setText(modificarProducto.getCategoria_producto());
-        vistaComerciante.getSpinnerEditarPrecio().setValue(modificarProducto.getPrecio());
-        vistaComerciante.getTxtEditarDescripcion().setText(modificarProducto.getDescipcion_producto());        
-    }
+    }    
     
     public void EditarProducto(){
         Productos productoOriginal = servidorPeticiones.devolverProductos(vistaComerciante.getTxtBuscarProducto().getText());
@@ -104,23 +138,95 @@ public class ControladorComerciante implements ActionListener{
         nuevoProducto.setPrecio(precio);
         nuevoProducto.setCategoria_producto(vistaComerciante.getTxtEditarCategoria().getText());
         
-        servidorPeticiones.editarProducto(nuevoProducto, productoOriginal);
-        vistaComerciante.setDatos();
+        try {       
+            vSocketCliente = new Socket("localhost", 10579);
+            vSerializador = new ObjectOutputStream(vSocketCliente.getOutputStream());
+            vCanal = new DataOutputStream(vSocketCliente.getOutputStream());
+            
+            
+            vCanal.writeInt(2);
+            vSerializador.writeObject(nuevoProducto);    
+            vSerializador.writeObject(productoOriginal);
+            vSerializador.close();
+        } catch (IOException ex) {
+            Logger.getLogger(ControladorComerciante.class.getName()).log(Level.SEVERE, null, ex);
+        } 
+        
+        //servidorPeticiones.editarProducto(nuevoProducto, productoOriginal);
     }
     
-    public void EliminarProducto(){
-        boolean eliminado = false;   
-        String buscarProducto = vistaComerciante.getTxtEliminar().getText();
+    public void EliminarProducto() throws ProductoNoEncontrado{ 
+        String buscarProducto = vistaComerciante.getTxtEliminar().getText();       
+        boolean respuesta = false;
         
-        try {
-            servidorPeticiones.eliminarProducto(buscarProducto);
-            vistaComerciante.setDatos();
-        } catch (ProductoNoEncontrado ex) {
-            System.out.print(ex);
+        try {   
+            vSocketCliente = new Socket("localhost", 10579);
+            vSerializador = new ObjectOutputStream(vSocketCliente.getOutputStream());
+            vCanal = new DataOutputStream(vSocketCliente.getOutputStream());
+            
+            
+            vCanal.writeInt(3);
+            vCanal.writeUTF(buscarProducto);
+            
+            DataInputStream vRespuesta = new DataInputStream(vSocketCliente.getInputStream());
+            
+            respuesta = vRespuesta.readBoolean();  
+            vSerializador.close();
+        } catch (IOException ex) {
+            Logger.getLogger(ControladorComerciante.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        
+        if(respuesta == true){
+            JOptionPane.showMessageDialog(null, "El producto " + buscarProducto + " fue eliminado con éxito.");
+        }else{
+            throw new ProductoNoEncontrado("El producto " + buscarProducto + " no fue encontrado.");
         }
     }
     
-    public void GestionarPedidos(){}
+    public void GestionarPedidos(){        
+        int numeroPedido = Integer.parseInt(vistaComerciante.getTxtNumeroPedido().getText());
+        int numeroEnvio = Integer.parseInt(vistaComerciante.getTxtNumeroRastreo().getText());       
+        String estadoPedido = (String) vistaComerciante.getJcbEstadoEnvio().getSelectedItem(); 
+        
+        boolean respuesta = false;
+        
+        nuevopedido.setNumero_pedido(numeroPedido);                
+        if(estadoPedido.equals("Enviado")){
+            nuevopedido.setEstado(true);
+        }else{
+            nuevopedido.setEstado(false);
+        }                
+        nuevopedido.setNumeroEnvio(numeroEnvio);    
+        
+        System.out.print(nuevopedido.getNumero_pedido() + " " + nuevopedido.getNumeroEnvio() + " " + nuevopedido.isEstado());
+        
+        try{  
+            vSocketCliente = new Socket("localhost", 10579);
+            vSerializador = new ObjectOutputStream(vSocketCliente.getOutputStream());
+            vCanal = new DataOutputStream(vSocketCliente.getOutputStream());
+            
+            
+            vCanal.writeInt(9);
+            vSerializador.writeObject(nuevopedido);   
+            
+            DataInputStream vRespuesta = new DataInputStream(vSocketCliente.getInputStream());
+            
+            respuesta = vRespuesta.readBoolean();  
+            
+            vSerializador.close();
+        } catch (IOException ex) {
+            System.out.print("s" + ex);
+        }       
+        
+        if(respuesta == true){
+            JOptionPane.showMessageDialog(null, "Pedido Enviado con éxito");
+        } else{
+            JOptionPane.showMessageDialog(null, "Pedido no encontrado");
+        }                
+        
+        vistaComerciante.getTxtNumeroPedido().setText("");
+        vistaComerciante.getTxtNumeroRastreo().setText("");        
+    }
         
     public void actualizarPedidos(){
         vistaComerciante.setDatosPedidos(servidorPeticiones.obtenerMisPedidos(identificadorUsuario));
@@ -129,15 +235,65 @@ public class ControladorComerciante implements ActionListener{
     
     public void modificarContacto(){        
         String nuevoContacto = vistaContacto.getTxtNuevoContacto().getText();
-        servidorPeticiones.modificarContacto(nuevoContacto, identificadorUsuario);
-        vistaComerciante.setTxtContacto(nuevoContacto);
+        boolean respuesta = false;
+        
+        try {   
+            vSocketCliente = new Socket("localhost", 10579);
+            vSerializador = new ObjectOutputStream(vSocketCliente.getOutputStream());
+            vCanal = new DataOutputStream(vSocketCliente.getOutputStream());
+            
+            vCanal.writeInt(7);
+            vCanal.writeUTF(nuevoContacto);
+            vCanal.writeInt(identificadorUsuario);
+            
+            DataInputStream vRespuesta = new DataInputStream(vSocketCliente.getInputStream());
+            
+            respuesta = vRespuesta.readBoolean();   
+            
+            vSerializador.close();
+        } catch (IOException ex) {
+            Logger.getLogger(ControladorComerciante.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        
+        if(respuesta == true){
+            JOptionPane.showMessageDialog(null, "El contacto fue actualizado con éxito.");
+            vistaComerciante.setTxtContacto(nuevoContacto);
+        }else{
+            JOptionPane.showMessageDialog(null, "El contacto no se pudo actualizar.");
+        }
         vistaContacto.dispose();
     }
     
     public void modificarDireccion(){
         String nuevaDireccion = vistaDireccion.getTxtNuevaDireccion().getText();
         servidorPeticiones.modificarDireccion(nuevaDireccion, identificadorUsuario);
-        vistaComerciante.setTxtDireccionEmpresa(nuevaDireccion);
+        
+        boolean respuesta = false;
+        
+        try {   
+            vSocketCliente = new Socket("localhost", 10579);
+            vSerializador = new ObjectOutputStream(vSocketCliente.getOutputStream());
+            vCanal = new DataOutputStream(vSocketCliente.getOutputStream());
+            
+            vCanal.writeInt(8);
+            vCanal.writeUTF(nuevaDireccion);
+            vCanal.writeInt(identificadorUsuario);
+            
+            DataInputStream vRespuesta = new DataInputStream(vSocketCliente.getInputStream());
+            
+            respuesta = vRespuesta.readBoolean();  
+            
+            vSerializador.close();
+        } catch (IOException ex) {
+            Logger.getLogger(ControladorComerciante.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        
+        if(respuesta == true){
+            JOptionPane.showMessageDialog(null, "La dirección fue actualizado con éxito.");
+            vistaComerciante.setTxtDireccionEmpresa(nuevaDireccion);
+        }else{
+            JOptionPane.showMessageDialog(null, "La dirección no se pudo actualizar.");
+        }
         vistaDireccion.dispose();    
     }
     
@@ -146,10 +302,29 @@ public class ControladorComerciante implements ActionListener{
         
         nuevaPromocion.setId(identificadorUsuario);
         nuevaPromocion.setCodigoPromocional(vistaComerciante.getTxtCodPromo().getText());
-        nuevaPromocion.setPorcentajeDescuento(PorcentajeDescuento);
+        nuevaPromocion.setPorcentajeDescuento(PorcentajeDescuento);        
+        boolean respuesta = false;
         
-        servidorPeticiones.CrearPromocion(nuevaPromocion);
-        vistaComerciante.setDatosPromociones();
+        try {      
+            vSocketCliente = new Socket("localhost", 10579);
+            vSerializador = new ObjectOutputStream(vSocketCliente.getOutputStream());
+            vCanal = new DataOutputStream(vSocketCliente.getOutputStream());
+            
+            vCanal.writeInt(6);
+            vSerializador.writeObject(nuevaPromocion);
+            vistaComerciante.setDatos();
+            
+            DataInputStream vRespuesta = new DataInputStream(vSocketCliente.getInputStream());
+            
+            respuesta = vRespuesta.readBoolean();   
+            vSerializador.close();
+        } catch (IOException ex) {
+            Logger.getLogger(ControladorComerciante.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        if(respuesta){
+            JOptionPane.showMessageDialog(null, "Promoción " + nuevaPromocion.getCodigoPromocional() + " fue agregado con éxito");
+            vistaComerciante.setDatosPromociones();
+        }
     }
     
     public void MiPerfil(int id){        
@@ -169,8 +344,17 @@ public class ControladorComerciante implements ActionListener{
         vistaComerciante.getTxtAgregarDescripcion().setText("");
     }
     
-    public void cerrarSesion(){
+    public void cerrarSesion(){        
         vistaPrincipal.mostrarVentanaMenuPrincipal();
+        
+        if(vSerializador != null){
+            try {
+                vSerializador.close();
+                vCanal.close();
+            } catch (IOException ex) {
+                Logger.getLogger(ControladorComerciante.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
         vistaComerciante.dispose();   
         JOptionPane.showMessageDialog(null, "Sesión Cerrada"); 
     }
@@ -178,17 +362,11 @@ public class ControladorComerciante implements ActionListener{
     public void crearCliente(){   
         Socket vSocketCliente;       
 
-        try{
-            vSocketCliente = new Socket("localhost", 10580);
-   
-            //DataOutputStream vCanal = new DataOutputStream(vSocketCliente.getOutputStream());
-            ObjectOutputStream vSerializador = new ObjectOutputStream(vSocketCliente.getOutputStream());                      
-
-            //Enviamos el evento al servidor
-            //vSerializador.writeObject(nuevoVoto);     
-            
-            //vCanal.close();
-            vSerializador.close();
+        try{            
+            vSocketCliente = new Socket("localhost", 10579);
+            vSerializador = new ObjectOutputStream(vSocketCliente.getOutputStream());
+            vCanal = new DataOutputStream(vSocketCliente.getOutputStream());
+;
         } catch (IOException ex) {
             System.out.print("s" + ex);
         }  
@@ -198,15 +376,23 @@ public class ControladorComerciante implements ActionListener{
     public void actionPerformed(ActionEvent e) {
         if(e.getSource() == vistaComerciante.getBtnAgregarProducto()){
             AgregarProducto();
+            vistaComerciante.setDatos();
         }
         if(e.getSource() == vistaComerciante.getBtnEliminar()){
-            EliminarProducto();
+            try {
+                EliminarProducto();
+            } catch (ProductoNoEncontrado ex) {
+                System.out.print("Producto no encontrado");
+            }
+            vistaComerciante.setDatos();
         }
         if(e.getSource() == vistaComerciante.getBtnBuscarProducto()){
             BuscarProducto();
         }
         if(e.getSource() == vistaComerciante.getBtnEditarProducto()){
-            EditarProducto();
+            EditarProducto();            
+            JOptionPane.showMessageDialog(null, "Producto modificado con éxito"); 
+            vistaComerciante.setDatos();
         }
         if(e.getSource() == vistaComerciante.getBtnModificarContacto()){
             vistaContacto.setVisible(true);
@@ -222,6 +408,9 @@ public class ControladorComerciante implements ActionListener{
         }
         if(e.getSource() == vistaComerciante.getBtnActualizarPedidos()){
             actualizarPedidos();
+        }
+        if(e.getSource() == vistaComerciante.getBtnActualizar()){
+            GestionarPedidos();
         }
         
         //Botones para modificar información del cliente

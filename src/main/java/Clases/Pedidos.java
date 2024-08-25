@@ -1,6 +1,8 @@
 package Clases;
 
-public class Pedidos {
+import java.io.Serializable;
+
+public class Pedidos implements Serializable{
     public int Numero_pedido;
     public String codigo_promocional;  
     public int cantidad;

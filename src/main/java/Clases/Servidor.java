@@ -1,6 +1,8 @@
 package Clases;
 
 import Controlador.ControladorComerciante;
+import Controlador.ControladorMenuPrincipal;
+import Vistas.IniciarSesion;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.FileInputStream;
@@ -26,10 +28,10 @@ public class Servidor extends Thread{
     ArrayList<Productos> productosColeccion = new ArrayList<Productos>();
     ArrayList<Promociones> promociones = new ArrayList<Promociones>();
     ArrayList<Productos> productosEncontrados = new ArrayList<Productos>();   
-    ArrayList<CarritodeCompras> productosCarrito = new ArrayList<>();       
+    ArrayList<CarritodeCompras> productosCarrito = new ArrayList<>();    
+
         
-    Pedidos nuevoPedido = new Pedidos();      
-    
+    Pedidos nuevoPedido = new Pedidos();          
     public JTextArea bitacora;
     
     public Servidor() {}    
@@ -41,30 +43,182 @@ public class Servidor extends Thread{
     public void run(){
         ServerSocket vSocketServidor;
         try {
-            vSocketServidor = new ServerSocket(10579);
             this.bitacora.append("Iniciando Servidor...\n");
+            vSocketServidor = new ServerSocket(10579);
             while(true){
                 Socket vClienteRecibido;
-                vClienteRecibido = vSocketServidor.accept();
-                DataInputStream vCanal = new DataInputStream(vClienteRecibido.getInputStream());
-                ObjectInputStream vDeserializador = new ObjectInputStream(vClienteRecibido.getInputStream());
-                //votaciones Votacion = (votaciones) vDeserializador.readObject();
+                this.bitacora.append("Esperando conexion...\n");
+                vClienteRecibido = vSocketServidor.accept();                
+                this.bitacora.append("Conexion recibida...\n");
                 
-                //Serializador s = new Serializador();
-                //votaciones VotacionBD = (votaciones) s.DesSerializar(Votacion);   
-                               
-                
-                vDeserializador.close();
-                vClienteRecibido.close();
+                new Thread(new ClienteHilo(vClienteRecibido, bitacora)).start();
             }
-
-
         } catch (IOException ex) {
             System.out.print(this + "s" + ex.getMessage());
+        } catch (Exception e) {
+            System.out.print(this + "s" + e.getMessage());
         }
     }
     
+    class ClienteHilo implements Runnable{
+        private Socket vClienteRecibido;
+        public JTextArea bitacora;
         
+        public ClienteHilo(Socket socket, JTextArea bitacora){
+            this.vClienteRecibido = socket;
+            this.bitacora = bitacora;
+        }
+        
+        public void run(){
+            try{
+                DataInputStream vCanal = new DataInputStream(vClienteRecibido.getInputStream());
+                DataOutputStream vRespuesta = new DataOutputStream(vClienteRecibido.getOutputStream());
+                ObjectInputStream vDeserializador = new ObjectInputStream(vClienteRecibido.getInputStream());
+                
+                while(true){                    
+                    int numeroTransaccion = vCanal.readInt();
+
+                    //Transacciones de comerciante
+                    //1 = Agregar Producto
+                    if(numeroTransaccion == 1){
+                        this.bitacora.append("Método agregar producto\n");
+                        Productos productoagregar = (Productos) vDeserializador.readObject();
+                        agregarProducto(productoagregar);                        
+                        vRespuesta.writeBoolean(true);
+                    }
+                    //2 = Editar Producto
+                    else if(numeroTransaccion == 2){
+                        this.bitacora.append("Método editar producto\n");
+                        Productos modificado = (Productos) vDeserializador.readObject();
+                        Productos viejo = (Productos) vDeserializador.readObject();
+                        editarProducto(modificado, viejo);                    
+                    }
+                    //3 = Eliminar Producto
+                    else if(numeroTransaccion == 3){
+                        String palabraEliminar = vCanal.readUTF();
+                        boolean eliminado = eliminarProducto(palabraEliminar);
+                        vRespuesta.writeBoolean(eliminado);
+                    }
+                    //4 = Iniciar Sesión
+                    else if(numeroTransaccion == 4){  
+                        int idEncontrado = iniciarSesion(vCanal.readUTF(), vCanal.readUTF());
+                        if(idEncontrado != 0){
+                           vRespuesta.writeInt(idEncontrado);
+                        }else{
+                           vRespuesta.writeInt(idEncontrado);
+                        }
+                    }
+                    //5 = Registrar Comerciante
+                    else if(numeroTransaccion == 5){
+                        Comerciantes nuevoComerciante = (Comerciantes) vDeserializador.readObject();
+                        System.out.print(nuevoComerciante.getCorreoElectronico());
+                        registrarUsuarios(nuevoComerciante);
+                    }
+                    //6 = Crear Promociones
+                    else if(numeroTransaccion == 6){
+                        Promociones nuevaPromocion = (Promociones) vDeserializador.readObject();
+                        CrearPromocion(nuevaPromocion);
+                        vRespuesta.writeBoolean(true);
+                    }
+                    //7 = Modificar Contacto
+                    else if(numeroTransaccion == 7){                        
+                        modificarContacto(vCanal.readUTF(), vCanal.readInt());
+                        vRespuesta.writeBoolean(true);
+                    }
+                    //8 = Modificar Direccion
+                    else if(numeroTransaccion == 8){
+                        modificarDireccion(vCanal.readUTF(), vCanal.readInt());
+                        vRespuesta.writeBoolean(true);
+                    }
+                    //9 = Modificar o gestionar Pedidos desde el lado del comerciante
+                    else if(numeroTransaccion == 9){
+                        Pedidos nuevoPedido = (Pedidos) vDeserializador.readObject();
+
+                        System.out.print("(" + nuevoPedido.getNumero_pedido() + " " + nuevoPedido.getNumeroEnvio() + " " + nuevoPedido.isEstado() + "\n");
+
+                        if(nuevoPedido.isEstado()){
+                            this.bitacora.append("Soy verdadero " + nuevoPedido.isEstado() + "\n");
+                            agregarNumeroEnvio(nuevoPedido.getNumero_pedido(), nuevoPedido.getNumeroEnvio(), 1);
+                        }else{
+                            this.bitacora.append("Soy falso " + nuevoPedido.isEstado() + "\n");
+                            agregarNumeroEnvio(nuevoPedido.getNumero_pedido(), nuevoPedido.getNumeroEnvio(), 0);
+                        }
+                        vRespuesta.writeBoolean(true);
+                    }
+                    
+                    //Transacciones de comerciante
+                    //10 = Mostrar Productos
+                    else if(numeroTransaccion == 10){
+
+                    }                    
+                    //11 = Buscar Productos por nombre 
+                    else if(numeroTransaccion == 11){
+
+                    }
+                    //12 = Buscar Productos por Categoria
+                    else if(numeroTransaccion == 12){
+
+                    }
+                    //13 = Filtrar por Precio
+                    else if(numeroTransaccion == 13){
+
+
+                    }
+                    //14 = Agregar productos al carrito
+                    else if(numeroTransaccion == 14){
+
+
+                    }
+                    //15 = Aplicar promocion
+                    else if(numeroTransaccion == 15){
+
+
+                    }
+                    //16 = Procesar Compra
+                    else if(numeroTransaccion == 16){
+
+
+                    }
+                    //17 = Vaciar Carrito
+                    else if(numeroTransaccion == 17){
+
+
+                    }
+                    //18
+                    else if(numeroTransaccion == 18){
+
+
+                    }
+                    //19
+                    else if(numeroTransaccion == 19){
+
+
+                    }
+                    //20
+                    else if(numeroTransaccion == 20){
+
+
+                    }
+                    //21
+                    else if(numeroTransaccion == 21){
+
+
+                    }                    
+                }                              
+            }catch (IOException ex) {
+               System.out.print(this + "s" + ex.getMessage());
+            } catch (Exception e) {
+               System.out.print(this + "s" + e.getMessage());
+            }finally{
+                try {         
+                    vClienteRecibido.close();
+                } catch (IOException ex) {
+                    Logger.getLogger(Servidor.class.getName()).log(Level.SEVERE, null, ex);
+                }
+            }                              
+        }        
+    }
+    
     //--Métodos y peticiones creadas por el comerciante
     //Método para agregar productos a la colección
     public void agregarProducto(Productos p){
@@ -74,24 +228,25 @@ public class Servidor extends Thread{
     }
     
     //Método para eliminar productos a la colección
-    public void eliminarProducto(String buscarProducto) throws ProductoNoEncontrado{
+    public boolean eliminarProducto(String buscarProducto) throws ProductoNoEncontrado{
         DesSerializar(); 
         
         Productos nuevoProducto = new Productos();
         nuevoProducto.setNombre_producto(buscarProducto);
+        boolean eliminado = false;
         
         if(productosColeccion.contains(nuevoProducto)){
             int index = productosColeccion.indexOf(nuevoProducto);
             productosColeccion.remove(productosColeccion.get(index));
-            JOptionPane.showMessageDialog(null, "El producto " + buscarProducto + " fue eliminado con éxito.");
-        }else{
-            throw new ProductoNoEncontrado("El producto " + buscarProducto + " no fue encontrado.");
+            eliminado = true;           
         }
+        
         Serializar();                
+        return eliminado;
     }
     
     //Método para editar productos a la colección
-    public boolean editarProducto(Productos modificado, Productos viejo){
+    public void editarProducto(Productos modificado, Productos viejo){
         productosColeccion = DesSerializar(); 
         boolean productoEncontrado = false;        
         
@@ -103,17 +258,8 @@ public class Servidor extends Thread{
             productosColeccion.get(index).setDescipcion_producto(modificado.getDescipcion_producto());
             productosColeccion.get(index).setPrecio(modificado.getPrecio());
             productoEncontrado = true;
-            JOptionPane.showMessageDialog(null, "Producto Modificado");
-        }else{
-                JOptionPane.showMessageDialog(null, "No soy encontrado");
-        }
-        
-        Serializar(); 
-        if(productoEncontrado){
-            return true;
-        }else{
-            return false;
-        }            
+        }        
+        Serializar();       
     }
     
     //Método para devolver busqueda de un producto
@@ -126,7 +272,8 @@ public class Servidor extends Thread{
             if(productosColeccion.get(i).getNombre_producto().equals(ProductoEncontrar)){
                 return productosColeccion.get(i);
             }
-        }        
+        }
+        
         return productoEncontrado;
     }
     
@@ -178,6 +325,7 @@ public class Servidor extends Thread{
     
     //Método para registrar comerciantes a la base de datos
     public void registrarUsuarios(Comerciantes nuevoComerciante){
+        System.out.print(nuevoComerciante.getCorreoElectronico());
         try{
             Connection nuevaConexion = ConexionBD.Conexion();
 
@@ -204,7 +352,7 @@ public class Servidor extends Thread{
     }
     
     ////Método para que los comerciantes inicien sesión
-    public void iniciarSesion(String correoIngresado, String contrasenaIngresado) throws ComercianteNoEncontrado{
+    public int iniciarSesion(String correoIngresado, String contrasenaIngresado) throws ComercianteNoEncontrado{
         String correoEncontrado = "";
         String contrasenaEncontrado = "";
         int idEncontrado = 0;
@@ -229,21 +377,21 @@ public class Servidor extends Thread{
             }
             
             if(correoIngresado.equals(correoEncontrado) && correoIngresado.isBlank() == false){
-                if(contrasenaIngresado.equals(contrasenaEncontrado) && idEncontrado != 0){
-                    ControladorComerciante mc = new ControladorComerciante(idEncontrado);
-                    mc.mostrarVentanaComerciante();
-                    JOptionPane.showMessageDialog(null, "Bienvenido al sistema");
+                if(contrasenaIngresado.equals(contrasenaEncontrado) && idEncontrado != 0){                                   
+                    idEncontrado = idEncontrado;
                     //System.out.print("Id: " + idEncontrado + "/nCorreo: " + correoEncontrado + "\n Contraseña: " + contrasenaEncontrado);
                 }else{
-                    throw new ComercianteNoEncontrado("Contraseña inválida"); 
+                    idEncontrado = 0;
                 }
             }else{
-                throw new ComercianteNoEncontrado("Correo eléctrónico inválido"); 
-            }         
+                idEncontrado = 0;
+            }   
             //}
         } catch (SQLException ex) {
             System.out.print("Error: " + ex.getMessage());
-        }           
+        }
+        
+        return idEncontrado;
     }
     
     public ArrayList<Pedidos> obtenerMisPedidos(int id){        
@@ -270,8 +418,10 @@ public class Servidor extends Thread{
             while(datos.next()){
                 Pedidos pedidoEncontrado = new Pedidos();
                 Productos nombreEncontrar = new Productos();
+                
                 pedidoEncontrado.setNumero_pedido(datos.getInt("id"));
                 String productosEncontrados = datos.getString("productos");
+                
                 String[] partes = productosEncontrados.split(",");
                 
                 for(String parte : partes){
@@ -285,8 +435,10 @@ public class Servidor extends Thread{
                             pedidoEncontrado.setProductosSeleccionados(misproductos);
                             pedidoEncontrado.setPrecioComerciante(nuevoPrecio);
                             pedidoEncontrado.setCodigo_promocional(datos.getString("CodigoPromocional"));
-                            pedidoEncontrado.setEstado(datos.getBoolean("estadoPedido"));                                                        
-                            misPedidos.add(pedidoEncontrado);                                                            
+                            pedidoEncontrado.setEstado(datos.getBoolean("estadoPedido"));
+                            pedidoEncontrado.setNumeroEnvio(datos.getInt("numeroEnvio"));
+                            misPedidos.add(pedidoEncontrado);                              
+                            break;
                         }                                               
                     }
                 }
@@ -300,8 +452,7 @@ public class Servidor extends Thread{
     
     public ArrayList<Clientes> obtenerClientes(int id){
         ArrayList<Clientes> clientes = new ArrayList<Clientes>();
-        ArrayList<Pedidos> misPedidos = new ArrayList<Pedidos>();
-        ArrayList<Productos> Productos = DesSerializar();
+        ArrayList<Pedidos> misPedidos = obtenerMisPedidos(id);
 
         String misproductos = "";
         
@@ -313,46 +464,23 @@ public class Servidor extends Thread{
             String comandoSelect = "SELECT * FROM proyectoClienteServidor.ClientesPedidos;";
             PreparedStatement comandoSelectPreparado = nuevaConexion.prepareStatement(comandoSelect);
         
-            //Definimos los parametros
-            
+            //Definimos los parametros            
             ResultSet datos = comandoSelectPreparado.executeQuery();
+
             
-            String comandoSelectPedidos = "SELECT * FROM proyectoClienteServidor.Pedidos;";
-            PreparedStatement comandoPedidosPrepared = nuevaConexion.prepareStatement(comandoSelectPedidos);
-        
-            //Definimos los parametros
-            
-            ResultSet datosPedidos = comandoPedidosPrepared.executeQuery();
-            
-            while(datosPedidos.next()){
-                Pedidos pedidoEncontrado = new Pedidos();
-                Productos nombreEncontrar = new Productos();
+            while(datos.next()){
+                Clientes clienteEncontrado = new Clientes();
                 
-                pedidoEncontrado.setNumero_pedido(datosPedidos.getInt("id"));
-                String productosEncontrados = datosPedidos.getString("productos");
-                String[] partes = productosEncontrados.split(",");
-                
-                for(String parte : partes){
-                    nombreEncontrar.setNombre_producto(parte);
-                    if(Productos.contains(nombreEncontrar)){
-                        int index = Productos.indexOf(nombreEncontrar);
-                        if(Productos.get(index).getId() == id){
-                            //System.out.print("id: " + pedidoEncontrado.getNumero_pedido());
-                            while(datos.next()){
-                                Clientes  clienteEncontrado = new Clientes(); 
-                                System.out.print("cliente" + datos.getInt("id") + pedidoEncontrado.getNumero_pedido());
-                                if(pedidoEncontrado.getNumero_pedido() == datos.getInt("id")){
-                                    clienteEncontrado.setNombreCompleto(datos.getString("nombreCompletoCliente"));
-                                    clienteEncontrado.setCorreoElectronico(datos.getString("correoElectronicoCliente"));
-                                    clienteEncontrado.setNumeroTelefonico(datos.getString("numeroTelefonoCliente"));
-                                    clienteEncontrado.setDireccion(datos.getString("direccionCliente"));
-                                    clientes.add(clienteEncontrado); 
-                                }
-                            }
-                        }                                               
-                    }
-                }                
-            }                                     
+                for(Pedidos pedido : misPedidos){
+                   if(pedido.getNumero_pedido() == datos.getInt("id")){
+                        clienteEncontrado.setNombreCompleto(datos.getString("nombreCompletoCliente"));
+                        clienteEncontrado.setCorreoElectronico(datos.getString("correoElectronicoCliente"));
+                        clienteEncontrado.setNumeroTelefonico(datos.getString("numeroTelefonoCliente"));
+                        clienteEncontrado.setDireccion(datos.getString("direccionCliente"));
+                        clientes.add(clienteEncontrado); 
+                    } 
+                }
+            }                                    
             
         } catch (SQLException ex) {
             System.out.print("Error: " + ex.getMessage());
@@ -361,7 +489,7 @@ public class Servidor extends Thread{
         return clientes;               
     }
     
-    public void agregarNumeroEnvio(int numeroPedido, int numeroEnvio, boolean Estado){
+    public void agregarNumeroEnvio(int numeroPedido, int numeroEnvio, int Estado) throws SQLException{
         try{
             Connection nuevaConexion = ConexionBD.Conexion();
 
@@ -369,14 +497,13 @@ public class Servidor extends Thread{
             PreparedStatement comandoInsertPreparado = nuevaConexion.prepareStatement(comandoInsert);
 
             //Definimos los parametros
-            comandoInsertPreparado.setString(1, "" + numeroPedido);
-            comandoInsertPreparado.setString(2, "" + numeroEnvio);
+            comandoInsertPreparado.setString(1, "" + numeroEnvio);
+            comandoInsertPreparado.setString(2, "" + Estado);
 
             //Ejecutamos el comando
             comandoInsertPreparado.executeUpdate();
 
             //Mensaje final
-            JOptionPane.showMessageDialog(null, "Información actualizada");
             System.out.print("Se ha ingresado el registro correctamente");    
         }catch (SQLException ex) {
             Logger.getLogger(ConexionBD.class.getName()).log(Level.SEVERE, null, ex);
@@ -385,8 +512,7 @@ public class Servidor extends Thread{
     
     public void CrearPromocion(Promociones nuevaPromocion){
         DesSerializarPromociones();
-        promociones.add(nuevaPromocion);
-        JOptionPane.showMessageDialog(null, "Promoción " + nuevaPromocion.getCodigoPromocional() + " fue agregado con éxito");
+        promociones.add(nuevaPromocion);        
         SerializarPromociones();
     }
         
@@ -431,7 +557,6 @@ public class Servidor extends Thread{
             comandoInsertPreparado.executeUpdate();
 
             //Mensaje final
-            JOptionPane.showMessageDialog(null, "Número de contacto actualizado con éxito");
             System.out.print("Se ha ingresado el registro correctamente");    
         }catch (SQLException ex) {
             Logger.getLogger(ConexionBD.class.getName()).log(Level.SEVERE, null, ex);
@@ -442,7 +567,7 @@ public class Servidor extends Thread{
             try{
             Connection nuevaConexion = ConexionBD.Conexion();
 
-            String comandoInsert = "update proyectoClienteServidor.comerciantes set direccionomercio = ? where id = ?";
+            String comandoInsert = "update proyectoClienteServidor.comerciantes set direccioncomercio = ? where id = ?";
             PreparedStatement comandoInsertPreparado = nuevaConexion.prepareStatement(comandoInsert);
 
             //Definimos los parametros
@@ -453,7 +578,6 @@ public class Servidor extends Thread{
             comandoInsertPreparado.executeUpdate();
 
             //Mensaje final
-            JOptionPane.showMessageDialog(null, "Dirección actualizada con éxito");
             System.out.print("Se ha ingresado el registro correctamente");    
         }catch (SQLException ex) {
             Logger.getLogger(ConexionBD.class.getName()).log(Level.SEVERE, null, ex);

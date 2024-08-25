@@ -1,6 +1,8 @@
 package Clases;
 
-public class Clientes extends Usuarios{
+import java.io.Serializable;
+
+public class Clientes extends Usuarios implements Serializable{
     public String nombreCompleto;
     public String direccionCliente;
 

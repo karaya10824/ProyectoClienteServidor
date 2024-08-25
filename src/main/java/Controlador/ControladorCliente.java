@@ -6,13 +6,16 @@ import Clases.Pedidos;
 import Clases.ProductoNoEncontrado;
 import Clases.Productos;
 import Clases.Servidor;
-import static Controlador.ControladorComerciante.vistaComerciante;
-import static Controlador.ControladorMenuPrincipal.vistaPrincipal;
+import static Controlador.ControladorComerciante.vistaPrincipal;
 import Vistas.ClienteMenu;
 import Vistas.ClienteProcesarPago;
 import Vistas.ComercianteMenu;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.DataOutputStream;
+import java.io.IOException;
+import java.io.ObjectOutputStream;
+import java.net.Socket;
 import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -21,6 +24,7 @@ import javax.swing.JOptionPane;
 public class ControladorCliente implements ActionListener{
     public ClienteMenu vistaCliente; 
     public Servidor servidorPeticiones;
+    public ControladorMenuPrincipal vistaPrincipal;
     public ClienteProcesarPago vistaProcesarPago;
     
     public CarritodeCompras AgregarProductoCarrito;
@@ -29,7 +33,11 @@ public class ControladorCliente implements ActionListener{
     public Clientes cliente;    
     public Pedidos nuevoPedido; 
     
-    public ControladorCliente(){
+    Socket vSocketCliente;
+    DataOutputStream vCanal;
+    ObjectOutputStream vSerializador;
+    
+    public ControladorCliente(){        
         vistaCliente = new ClienteMenu();
         vistaProcesarPago = new ClienteProcesarPago();
         
@@ -43,6 +51,7 @@ public class ControladorCliente implements ActionListener{
         vistaCliente.getBtnDescuento().addActionListener(this);
         vistaCliente.getBtnProcesarCompra().addActionListener(this);
         vistaCliente.getBtnCarritoVacio().addActionListener(this);
+        vistaCliente.getBtnSalir().addActionListener(this);
         
         vistaProcesarPago.getBtnCerrar().addActionListener(this);
         vistaProcesarPago.getBtnProcesarPago().addActionListener(this);
@@ -59,8 +68,7 @@ public class ControladorCliente implements ActionListener{
         int cantidad = (Integer) vistaCliente.getTxtCantidad().getValue();
         
         AgregarProductoCarrito.setProducto(servidorPeticiones.buscarProductosPorNombre(vistaCliente.getTxtNombreProducto().getText()));    
-        AgregarProductoCarrito.setCantidad(cantidad);
-          
+        AgregarProductoCarrito.setCantidad(cantidad);          
         
         productosCarrito = servidorPeticiones.agregarAlCarrito(AgregarProductoCarrito);  
         mostrarInformacion(productosCarrito);             
@@ -101,6 +109,21 @@ public class ControladorCliente implements ActionListener{
         servidorPeticiones.ProcesarCompra(productosCarrito, cliente, nuevoPedido);
     }
     
+    public void cerrarSesion(){     
+        vistaPrincipal = new ControladorMenuPrincipal();
+        vistaPrincipal.mostrarVentanaMenuPrincipal();
+        if(vSerializador != null){
+            try {
+                vSerializador.close();
+                vCanal.close();                                
+            } catch (IOException ex) {
+                Logger.getLogger(ControladorComerciante.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
+        vistaCliente.dispose();   
+        JOptionPane.showMessageDialog(null, "Bienvenido al menú principal"); 
+    }
+    
     @Override
     public void actionPerformed(ActionEvent e) {
         if(e.getSource() == vistaCliente.getBtnAgregarProductoCarrito()){
@@ -132,6 +155,12 @@ public class ControladorCliente implements ActionListener{
                 vistaProcesarPago.setVisible(true);
             }
         }  
+        
+        if(e.getSource() == vistaCliente.getBtnSalir()){
+            cerrarSesion();
+        }  
+        
+        //Métodos para procesar las compras
         if(e.getSource() == vistaProcesarPago.getBtnProcesarPago()){
             procesarCompra();
         }
