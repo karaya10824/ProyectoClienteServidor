@@ -29,7 +29,6 @@ public class Servidor extends Thread{
     ArrayList<Promociones> promociones = new ArrayList<Promociones>();
     ArrayList<Productos> productosEncontrados = new ArrayList<Productos>();   
     ArrayList<CarritodeCompras> productosCarrito = new ArrayList<>();    
-
         
     Pedidos nuevoPedido = new Pedidos();          
     public JTextArea bitacora;
@@ -73,6 +72,7 @@ public class Servidor extends Thread{
             try{
                 DataInputStream vCanal = new DataInputStream(vClienteRecibido.getInputStream());
                 DataOutputStream vRespuesta = new DataOutputStream(vClienteRecibido.getOutputStream());
+                ObjectOutputStream vRespuestaO = new ObjectOutputStream(vClienteRecibido.getOutputStream());
                 ObjectInputStream vDeserializador = new ObjectInputStream(vClienteRecibido.getInputStream());
                 
                 while(true){                    
@@ -90,18 +90,22 @@ public class Servidor extends Thread{
                     else if(numeroTransaccion == 2){
                         this.bitacora.append("Método editar producto\n");
                         Productos modificado = (Productos) vDeserializador.readObject();
-                        Productos viejo = (Productos) vDeserializador.readObject();
-                        editarProducto(modificado, viejo);                    
+                        Productos viejo = (Productos) vDeserializador.readObject();   
+                        boolean editado = editarProducto(modificado, viejo);
+                        vRespuesta.writeBoolean(editado);
                     }
                     //3 = Eliminar Producto
                     else if(numeroTransaccion == 3){
+                        this.bitacora.append("Método eliminar producto\n");
                         String palabraEliminar = vCanal.readUTF();
-                        boolean eliminado = eliminarProducto(palabraEliminar);
-                        vRespuesta.writeBoolean(eliminado);
+                        int eliminado = eliminarProducto(palabraEliminar);
+                        this.bitacora.append(eliminado + "");
+                        vRespuesta.writeInt(eliminado);
                     }
                     //4 = Iniciar Sesión
-                    else if(numeroTransaccion == 4){  
+                    else if(numeroTransaccion == 4){                          
                         int idEncontrado = iniciarSesion(vCanal.readUTF(), vCanal.readUTF());
+                        this.bitacora.append(idEncontrado + "");
                         if(idEncontrado != 0){
                            vRespuesta.writeInt(idEncontrado);
                         }else{
@@ -153,11 +157,13 @@ public class Servidor extends Thread{
                     }                    
                     //11 = Buscar Productos por nombre 
                     else if(numeroTransaccion == 11){
-
+                        Productos RespuestaProductos = buscarProductosPorNombre(vCanal.readUTF());
+                        vRespuestaO.writeObject(RespuestaProductos);                        
                     }
                     //12 = Buscar Productos por Categoria
                     else if(numeroTransaccion == 12){
-
+                        Productos RespuestaProductos = buscarProductosPorCategoria(vCanal.readUTF());
+                        vRespuestaO.writeObject(RespuestaProductos);  
                     }
                     //13 = Filtrar por Precio
                     else if(numeroTransaccion == 13){
@@ -184,26 +190,31 @@ public class Servidor extends Thread{
 
 
                     }
-                    //18
+                    //18 = Buscar Pedidos
                     else if(numeroTransaccion == 18){
 
 
                     }
-                    //19
+                    //19 = Mostrar Pedidos por ID
                     else if(numeroTransaccion == 19){
-
-
+                        Pedidos RespuestaProductos = mostrarPedidos(vCanal.readInt());
+                        vRespuestaO.writeObject(RespuestaProductos); 
                     }
-                    //20
+                    //20 = Mostrar Pedidos por Correo
                     else if(numeroTransaccion == 20){
-
-
+                        Pedidos RespuestaProductos = mostrarPedidosCorreo(vCanal.readUTF());
+                        vRespuestaO.writeObject(RespuestaProductos); 
                     }
                     //21
                     else if(numeroTransaccion == 21){
 
 
-                    }                    
+                    }   
+                    
+                    vCanal.close();
+                    vRespuesta.close();
+                    vRespuestaO.close();
+                    vDeserializador.close();
                 }                              
             }catch (IOException ex) {
                System.out.print(this + "s" + ex.getMessage());
@@ -228,17 +239,17 @@ public class Servidor extends Thread{
     }
     
     //Método para eliminar productos a la colección
-    public boolean eliminarProducto(String buscarProducto) throws ProductoNoEncontrado{
-        DesSerializar(); 
+    public int eliminarProducto(String buscarProducto) throws ProductoNoEncontrado{
+        productosColeccion = DesSerializar(); 
+        int eliminado = 0;
         
         Productos nuevoProducto = new Productos();
         nuevoProducto.setNombre_producto(buscarProducto);
-        boolean eliminado = false;
         
         if(productosColeccion.contains(nuevoProducto)){
             int index = productosColeccion.indexOf(nuevoProducto);
             productosColeccion.remove(productosColeccion.get(index));
-            eliminado = true;           
+            eliminado = 1;           
         }
         
         Serializar();                
@@ -246,7 +257,7 @@ public class Servidor extends Thread{
     }
     
     //Método para editar productos a la colección
-    public void editarProducto(Productos modificado, Productos viejo){
+    public boolean editarProducto(Productos modificado, Productos viejo){
         productosColeccion = DesSerializar(); 
         boolean productoEncontrado = false;        
         
@@ -259,7 +270,8 @@ public class Servidor extends Thread{
             productosColeccion.get(index).setPrecio(modificado.getPrecio());
             productoEncontrado = true;
         }        
-        Serializar();       
+        Serializar(); 
+        return productoEncontrado;
     }
     
     //Método para devolver busqueda de un producto
@@ -604,7 +616,24 @@ public class Servidor extends Thread{
         return productoEncontrado;
     }
     
-    public void buscarProductosPorCategoria(String NombreCategoria){}
+    public Productos buscarProductosPorCategoria(String NombreCategoria) throws ProductoNoEncontrado{
+        ArrayList<Productos> productosEncontrados = DesSerializar();
+
+        Productos productoEncontrado = null;
+        
+        Productos nuevoProducto = new Productos();
+        nuevoProducto.setCategoria_producto(NombreCategoria);
+        
+        if(productosEncontrados.contains(nuevoProducto)){
+            int index = productosEncontrados.indexOf(nuevoProducto);
+            productoEncontrado = productosEncontrados.get(index);
+
+        }else{            
+            throw new ProductoNoEncontrado("El producto no éxiste");
+        }
+        
+        return productoEncontrado;
+    }
     
     public void buscarProductosPorPalabra(String palabraClave){}
     
@@ -691,6 +720,82 @@ public class Servidor extends Thread{
         }catch (SQLException ex) {
             Logger.getLogger(ConexionBD.class.getName()).log(Level.SEVERE, null, ex);
         }
+    }
+    
+    public Pedidos mostrarPedidos(int correoONumero){
+        Pedidos nuevoPedido = new Pedidos();
+        
+        try {
+            //Conexión con la base de datos
+            Connection nuevaConexion = ConexionBD.Conexion();
+            
+            //Comando
+            String comandoSelectPrimero = "SELECT * from proyectoClienteServidor.pedidos where id = " + correoONumero;
+            //String comandoSelectPrimero = "SELECT FROM proyectoClienteServidor.pedidos UNION ALL SELECT correoElectronicoCliente FROM proyectoClienteServidor.ClientesPedidos; ";
+            PreparedStatement comandoSelectPreparado = nuevaConexion.prepareStatement(comandoSelectPrimero);
+        
+            //Definimos los parametros
+            
+            ResultSet datos = comandoSelectPreparado.executeQuery();
+            
+            while(datos.next()){
+                nuevoPedido.setNumeroEnvio(datos.getInt("numeroEnvio"));
+                nuevoPedido.setNumero_pedido(datos.getInt("id"));
+                nuevoPedido.setEstado(datos.getBoolean("estadoPedido"));
+                nuevoPedido.setProductosSeleccionados(datos.getString("productos"));
+            }   
+            
+           // String comandoSelectFinal = "SELECT * from proyectoClienteServidor.Pedidos where id = " + ;
+            //PreparedStatement comandoSelect = nuevaConexion.prepareStatement(comandoSelectFinal);
+        
+            //Definimos los parametros                        
+        }catch (SQLException ex) {
+            Logger.getLogger(ConexionBD.class.getName()).log(Level.SEVERE, null, ex);
+        }        
+        return nuevoPedido;
+    }
+    
+        public Pedidos mostrarPedidosCorreo(String correoONumero){
+        Pedidos nuevoPedido = new Pedidos();
+        try {
+            //Conexión con la base de datos
+            Connection nuevaConexion = ConexionBD.Conexion();
+            
+            //Comando
+            String comandoSelectPrimero = "SELECT * FROM proyectoClienteServidor.ClientesPedidos WHERE correoElectronicoCliente = ?";
+            PreparedStatement comandoSelectPreparado = nuevaConexion.prepareStatement(comandoSelectPrimero);
+        
+            //Definimos los parametros
+            
+            comandoSelectPreparado.setString(1, correoONumero);
+            ResultSet datos = comandoSelectPreparado.executeQuery();
+            
+            while(datos.next()){
+                nuevoPedido.setNumero_pedido(datos.getInt("id"));
+            }   
+            
+            Connection nuevaConexionPedidos = ConexionBD.Conexion();
+            
+            String comandoSelectFinal = "SELECT * from proyectoClienteServidor.Pedidos where id = " + nuevoPedido.getNumero_pedido()+";";
+            PreparedStatement comandoSelect = nuevaConexionPedidos.prepareStatement(comandoSelectFinal);
+            
+            ResultSet datosPedido = comandoSelect.executeQuery();
+            
+            while(datosPedido.next()){
+                
+                this.bitacora.append("" + datosPedido.getInt("numeroEnvio"));
+                this.bitacora.append("" + datosPedido.getString("productos"));
+                
+                nuevoPedido.setNumeroEnvio(datosPedido.getInt("numeroEnvio"));
+                nuevoPedido.setNumero_pedido(datosPedido.getInt("id"));
+                nuevoPedido.setEstado(datosPedido.getBoolean("estadoPedido"));
+                nuevoPedido.setProductosSeleccionados(datosPedido.getString("productos"));      
+            }
+            //Definimos los parametros                        
+        }catch (SQLException ex) {
+            Logger.getLogger(ConexionBD.class.getName()).log(Level.SEVERE, null, ex);
+        }        
+        return nuevoPedido;
     }
     
     public static void mostrarInformacion(ArrayList<CarritodeCompras> Carrito ){

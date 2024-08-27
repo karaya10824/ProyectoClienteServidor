@@ -1,6 +1,7 @@
 package Vistas;
 
 import Clases.CarritodeCompras;
+import Clases.Pedidos;
 import Clases.Productos;
 import Clases.Servidor;
 import Vistas.recursos.RenderTable;
@@ -18,7 +19,7 @@ public class ClienteMenu extends javax.swing.JFrame {
     DefaultTableModel dtmForm = new DefaultTableModel();
     DefaultTableModel dtmCarrito = new DefaultTableModel();
     DefaultTableModel dtmBuscar = new DefaultTableModel();
-    
+    DefaultTableModel dtmPedidos = new DefaultTableModel();
     Servidor servidor = new Servidor();
     
     Productos misProductos = new Productos();
@@ -26,18 +27,27 @@ public class ClienteMenu extends javax.swing.JFrame {
     public ClienteMenu() {
         initComponents();
         
-        ButtonGroup buttonGroup1 = new ButtonGroup();
+        jRadioButton1.setActionCommand("Nombre");
+        
+        jRadioButton2.setActionCommand("Categoria");
+
+        jRadioButton3.setActionCommand("PalabraClave");
+        
+        buttonGroup1 = new ButtonGroup();
         buttonGroup1.add(jRadioButton1);
         buttonGroup1.add(jRadioButton2);
-        buttonGroup1.add(jRadioButton3);
+        buttonGroup1.add(jRadioButton3); 
+        
+        buttonGroup2 = new ButtonGroup();
+        buttonGroup2.add(jRadioButton4);
+        buttonGroup2.add(jRadioButton5);        
         
         setModelo();
         setDatos();
         
         setModeloCarrito();
-        
+        setModeloPedidos();
         setModeloBuscar();
-        setDatosBuscar();
     }
 
         //Métodos creado para mostrar la vista de productos
@@ -54,7 +64,7 @@ public class ClienteMenu extends javax.swing.JFrame {
         ArrayList<Productos> NuevosproductosColeccion = misProductos.DesSerializar();
         
         for(Productos producto : NuevosproductosColeccion){
-                datos[0] = producto.getId();
+                datos[0] = servidor.devolverNombreTienda(producto.getId());
                 datos[1] = producto.getNombre_producto();
                 datos[2] = producto.getPrecio();
                 datos[3] = producto.getCategoria_producto();
@@ -71,15 +81,15 @@ public class ClienteMenu extends javax.swing.JFrame {
         String[] cabecera = {"Tienda", "Nombre","Precio","Categoria","Descripción"," "};
         
         dtmBuscar.setColumnIdentifiers(cabecera);
-        tblProductos.setModel(dtmBuscar);
+        tblBuscarProductos.setModel(dtmBuscar);
     }
     
-    public void setDatosBuscar(){
+    public void setDatosBuscar(Productos producto){
         dtmBuscar.setRowCount(0);
         Object[] datos = new Object[dtmBuscar.getColumnCount()];
         ArrayList<Productos> NuevosproductosColeccion = misProductos.DesSerializar();
         
-        for(Productos producto : NuevosproductosColeccion){
+        //for(Productos producto : NuevosproductosColeccion){
                 datos[0] = servidor.devolverNombreTienda(producto.getId());
                 datos[1] = producto.getNombre_producto();
                 datos[2] = producto.getPrecio();
@@ -87,10 +97,37 @@ public class ClienteMenu extends javax.swing.JFrame {
                 datos[4] = producto.getDescipcion_producto();
                 datos[5] = new JButton("Agregar Al Carrito");
                 dtmBuscar.addRow(datos);
-        }    
+        //}    
         
         this.tblBuscarProductos.setDefaultRenderer(Object.class, new RenderTable());
         tblBuscarProductos.setModel(dtmBuscar);
+    } 
+    
+    private void setModeloPedidos(){
+        String[] cabecera = {"Número de Pedido", "Productos","Número de Envío","Estado del Envío"};
+        
+        dtmPedidos.setColumnIdentifiers(cabecera);
+        tblPedidos.setModel(dtmPedidos);
+    }
+    
+    public void setDatosPedidos(Pedidos pedido){
+        dtmPedidos.setRowCount(0);
+        Object[] datos = new Object[dtmPedidos.getColumnCount()];
+        
+        //for(Productos producto : NuevosproductosColeccion){
+                datos[0] = pedido.getNumero_pedido();
+                datos[1] = pedido.getProductosSeleccionados();
+                datos[2] = pedido.getNumeroEnvio();
+                if(pedido.isEstado() == true){
+                datos[3] = "Enviado";
+                }else{
+                datos[3] = "No Enviado";
+            } 
+                dtmPedidos.addRow(datos);
+        //}    
+        
+        this.tblPedidos.setDefaultRenderer(Object.class, new RenderTable());
+        tblPedidos.setModel(dtmPedidos);
     } 
     
     private void setModeloCarrito(){
@@ -120,6 +157,22 @@ public class ClienteMenu extends javax.swing.JFrame {
         tblCarrito.setModel(dtmCarrito);
     }     
 
+    public JButton getBtnBuscarPedido() {
+        return btnBuscarPedido;
+    }
+
+    public void setBtnBuscarPedido(JButton btnBuscarPedido) {
+        this.btnBuscarPedido = btnBuscarPedido;
+    }    
+
+    public JTextField getTxtCorreoOid() {
+        return txtCorreoOid;
+    }
+
+    public void setTxtCorreoOid(JTextField txtCorreoOid) {
+        this.txtCorreoOid = txtCorreoOid;
+    }
+    
     public JLabel getLblDescuento() {
         return lblDescuento;
     }
@@ -239,6 +292,8 @@ public class ClienteMenu extends javax.swing.JFrame {
 
         buttonGroup1 = new javax.swing.ButtonGroup();
         jLabel9 = new javax.swing.JLabel();
+        jLayeredPane1 = new javax.swing.JLayeredPane();
+        buttonGroup2 = new javax.swing.ButtonGroup();
         jTabbedPane4 = new javax.swing.JTabbedPane();
         jPanel1 = new javax.swing.JPanel();
         jScrollPane1 = new javax.swing.JScrollPane();
@@ -260,10 +315,16 @@ public class ClienteMenu extends javax.swing.JFrame {
         jLabel6 = new javax.swing.JLabel();
         jScrollPane3 = new javax.swing.JScrollPane();
         tblBuscarProductos = new javax.swing.JTable();
+        jLabel14 = new javax.swing.JLabel();
         jPanel4 = new javax.swing.JPanel();
-        jTextField1 = new javax.swing.JTextField();
+        txtCorreoOid = new javax.swing.JTextField();
         btnBuscarPedido = new javax.swing.JButton();
         jLabel13 = new javax.swing.JLabel();
+        jScrollPane4 = new javax.swing.JScrollPane();
+        tblPedidos = new javax.swing.JTable();
+        jRadioButton4 = new javax.swing.JRadioButton();
+        jRadioButton5 = new javax.swing.JRadioButton();
+        jLabel15 = new javax.swing.JLabel();
         jPanel5 = new javax.swing.JPanel();
         jScrollPane2 = new javax.swing.JScrollPane();
         tblCarrito = new javax.swing.JTable();
@@ -285,6 +346,17 @@ public class ClienteMenu extends javax.swing.JFrame {
         btnSalir = new javax.swing.JButton();
 
         jLabel9.setText("jLabel9");
+
+        javax.swing.GroupLayout jLayeredPane1Layout = new javax.swing.GroupLayout(jLayeredPane1);
+        jLayeredPane1.setLayout(jLayeredPane1Layout);
+        jLayeredPane1Layout.setHorizontalGroup(
+            jLayeredPane1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 100, Short.MAX_VALUE)
+        );
+        jLayeredPane1Layout.setVerticalGroup(
+            jLayeredPane1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 100, Short.MAX_VALUE)
+        );
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -366,10 +438,13 @@ public class ClienteMenu extends javax.swing.JFrame {
         jLabel2.setText("Ingrese el método para filtrar el producto que desea buscar:");
 
         jRadioButton1.setText("Por Nombre");
+        jRadioButton1.setActionCommand("Nombre");
 
         jRadioButton2.setText("Por Categoria");
+        jRadioButton2.setActionCommand("Categoria");
 
         jRadioButton3.setText("Por Palabra Clave");
+        jRadioButton3.setActionCommand("PalabraClave");
         jRadioButton3.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jRadioButton3ActionPerformed(evt);
@@ -391,30 +466,38 @@ public class ClienteMenu extends javax.swing.JFrame {
         ));
         jScrollPane3.setViewportView(tblBuscarProductos);
 
+        jLabel14.setFont(new java.awt.Font("Helvetica Neue", 1, 13)); // NOI18N
+        jLabel14.setText("Productos encontrados:");
+
         javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
         jPanel2.setLayout(jPanel2Layout);
         jPanel2Layout.setHorizontalGroup(
             jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel2Layout.createSequentialGroup()
                 .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jScrollPane3, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 674, Short.MAX_VALUE)
                     .addGroup(jPanel2Layout.createSequentialGroup()
-                        .addContainerGap()
                         .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jRadioButton1)
-                            .addComponent(jRadioButton2)
-                            .addComponent(jRadioButton3)
-                            .addComponent(jLabel2, javax.swing.GroupLayout.PREFERRED_SIZE, 428, javax.swing.GroupLayout.PREFERRED_SIZE)
                             .addGroup(jPanel2Layout.createSequentialGroup()
-                                .addComponent(txtBuscarProducto, javax.swing.GroupLayout.PREFERRED_SIZE, 323, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(btnBuscarProducto))
-                            .addComponent(jLabel6, javax.swing.GroupLayout.PREFERRED_SIZE, 428, javax.swing.GroupLayout.PREFERRED_SIZE))
-                        .addGap(0, 240, Short.MAX_VALUE))
-                    .addComponent(jScrollPane3, javax.swing.GroupLayout.Alignment.TRAILING))
+                                .addContainerGap()
+                                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addComponent(jRadioButton1)
+                                    .addComponent(jRadioButton2)
+                                    .addComponent(jRadioButton3)
+                                    .addComponent(jLabel2, javax.swing.GroupLayout.PREFERRED_SIZE, 428, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                    .addGroup(jPanel2Layout.createSequentialGroup()
+                                        .addComponent(txtBuscarProducto, javax.swing.GroupLayout.PREFERRED_SIZE, 323, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                        .addComponent(btnBuscarProducto))
+                                    .addComponent(jLabel6, javax.swing.GroupLayout.PREFERRED_SIZE, 428, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                            .addGroup(jPanel2Layout.createSequentialGroup()
+                                .addGap(197, 197, 197)
+                                .addComponent(jSlider1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                        .addGap(0, 0, Short.MAX_VALUE)))
                 .addContainerGap())
             .addGroup(jPanel2Layout.createSequentialGroup()
-                .addGap(197, 197, 197)
-                .addComponent(jSlider1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(257, 257, 257)
+                .addComponent(jLabel14)
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         jPanel2Layout.setVerticalGroup(
@@ -434,9 +517,11 @@ public class ClienteMenu extends javax.swing.JFrame {
                 .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(btnBuscarProducto)
                     .addComponent(txtBuscarProducto, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jLabel14)
+                .addGap(5, 5, 5)
                 .addComponent(jScrollPane3, javax.swing.GroupLayout.PREFERRED_SIZE, 102, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(166, 166, 166)
+                .addGap(150, 150, 150)
                 .addComponent(jSlider1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap(330, Short.MAX_VALUE))
         );
@@ -447,6 +532,28 @@ public class ClienteMenu extends javax.swing.JFrame {
 
         jLabel13.setText("Ingrese el número de pedido o correo eléctronico utilizado para la compra:");
 
+        tblPedidos.setModel(new javax.swing.table.DefaultTableModel(
+            new Object [][] {
+                {null, null, null, null},
+                {null, null, null, null},
+                {null, null, null, null},
+                {null, null, null, null}
+            },
+            new String [] {
+                "Title 1", "Title 2", "Title 3", "Title 4"
+            }
+        ));
+        jScrollPane4.setViewportView(tblPedidos);
+
+        jRadioButton4.setText("Número de Pedido");
+        jRadioButton4.setActionCommand("pedido");
+
+        jRadioButton5.setText("Correo Eléctronico");
+        jRadioButton5.setActionCommand("correoelectronico");
+
+        jLabel15.setFont(new java.awt.Font("Helvetica Neue", 1, 13)); // NOI18N
+        jLabel15.setText("Pedidos encontrados:");
+
         javax.swing.GroupLayout jPanel4Layout = new javax.swing.GroupLayout(jPanel4);
         jPanel4.setLayout(jPanel4Layout);
         jPanel4Layout.setHorizontalGroup(
@@ -455,22 +562,46 @@ public class ClienteMenu extends javax.swing.JFrame {
                 .addContainerGap()
                 .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(jPanel4Layout.createSequentialGroup()
-                        .addComponent(jTextField1, javax.swing.GroupLayout.PREFERRED_SIZE, 294, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(6, 6, 6)
+                        .addComponent(jRadioButton4)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(btnBuscarPedido))
-                    .addComponent(jLabel13))
-                .addContainerGap(241, Short.MAX_VALUE))
+                        .addComponent(jRadioButton5)
+                        .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                    .addGroup(jPanel4Layout.createSequentialGroup()
+                        .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(jScrollPane4, javax.swing.GroupLayout.DEFAULT_SIZE, 668, Short.MAX_VALUE)
+                            .addGroup(jPanel4Layout.createSequentialGroup()
+                                .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addComponent(jLabel13)
+                                    .addGroup(jPanel4Layout.createSequentialGroup()
+                                        .addComponent(txtCorreoOid, javax.swing.GroupLayout.PREFERRED_SIZE, 294, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                        .addComponent(btnBuscarPedido)))
+                                .addGap(0, 0, Short.MAX_VALUE)))
+                        .addContainerGap())))
+            .addGroup(jPanel4Layout.createSequentialGroup()
+                .addGap(272, 272, 272)
+                .addComponent(jLabel15)
+                .addGap(0, 0, Short.MAX_VALUE))
         );
         jPanel4Layout.setVerticalGroup(
             jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel4Layout.createSequentialGroup()
                 .addContainerGap()
                 .addComponent(jLabel13)
-                .addGap(2, 2, 2)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jTextField1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jRadioButton4)
+                    .addComponent(jRadioButton5))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(txtCorreoOid, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(btnBuscarPedido))
-                .addContainerGap(737, Short.MAX_VALUE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jLabel15)
+                .addGap(10, 10, 10)
+                .addComponent(jScrollPane4, javax.swing.GroupLayout.PREFERRED_SIZE, 89, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(584, Short.MAX_VALUE))
         );
 
         jTabbedPane4.addTab("Mis Pedidos", jPanel4);
@@ -708,12 +839,15 @@ public class ClienteMenu extends javax.swing.JFrame {
     private javax.swing.JToggleButton btnDescuento;
     private javax.swing.JButton btnProcesarCompra;
     private javax.swing.JButton btnSalir;
-    private javax.swing.ButtonGroup buttonGroup1;
+    public javax.swing.ButtonGroup buttonGroup1;
+    public javax.swing.ButtonGroup buttonGroup2;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel10;
     private javax.swing.JLabel jLabel11;
     private javax.swing.JLabel jLabel12;
     private javax.swing.JLabel jLabel13;
+    private javax.swing.JLabel jLabel14;
+    private javax.swing.JLabel jLabel15;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;
@@ -722,6 +856,7 @@ public class ClienteMenu extends javax.swing.JFrame {
     private javax.swing.JLabel jLabel7;
     private javax.swing.JLabel jLabel8;
     private javax.swing.JLabel jLabel9;
+    private javax.swing.JLayeredPane jLayeredPane1;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JPanel jPanel4;
@@ -730,21 +865,25 @@ public class ClienteMenu extends javax.swing.JFrame {
     private javax.swing.JRadioButton jRadioButton1;
     private javax.swing.JRadioButton jRadioButton2;
     private javax.swing.JRadioButton jRadioButton3;
+    public javax.swing.JRadioButton jRadioButton4;
+    public javax.swing.JRadioButton jRadioButton5;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JScrollPane jScrollPane3;
+    private javax.swing.JScrollPane jScrollPane4;
     private javax.swing.JSlider jSlider1;
     private javax.swing.JTabbedPane jTabbedPane4;
-    private javax.swing.JTextField jTextField1;
     private javax.swing.JLabel lblDescuento;
     private javax.swing.JLabel lblDescuento1;
     private javax.swing.JLabel lblSubtotal;
     private javax.swing.JLabel lblTotal;
     private javax.swing.JTable tblBuscarProductos;
     private javax.swing.JTable tblCarrito;
+    private javax.swing.JTable tblPedidos;
     private javax.swing.JTable tblProductos;
     private javax.swing.JTextField txtBuscarProducto;
     private javax.swing.JSpinner txtCantidad;
+    private javax.swing.JTextField txtCorreoOid;
     private javax.swing.JTextField txtDescuento;
     private javax.swing.JTextField txtNombreProducto;
     // End of variables declaration//GEN-END:variables

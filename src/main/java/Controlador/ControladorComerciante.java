@@ -40,6 +40,7 @@ public class ControladorComerciante implements ActionListener{
     Socket vSocketCliente;
     DataOutputStream vCanal;
     ObjectOutputStream vSerializador;
+    DataInputStream vRespuesta;
     
     public ControladorComerciante(int id){
         this.identificadorUsuario = id;
@@ -128,9 +129,10 @@ public class ControladorComerciante implements ActionListener{
         vaciarEspacios();
     }    
     
-    public void EditarProducto(){
+    public void EditarProducto() throws ProductoNoEncontrado{
         Productos productoOriginal = servidorPeticiones.devolverProductos(vistaComerciante.getTxtBuscarProducto().getText());
-
+        boolean respuesta = false;
+        
         int precio = (Integer) vistaComerciante.getSpinnerEditarPrecio().getValue();
         
         nuevoProducto.setNombre_producto(vistaComerciante.getTxtEditarNombre().getText());
@@ -142,31 +144,10 @@ public class ControladorComerciante implements ActionListener{
             vSocketCliente = new Socket("localhost", 10579);
             vSerializador = new ObjectOutputStream(vSocketCliente.getOutputStream());
             vCanal = new DataOutputStream(vSocketCliente.getOutputStream());
-            
-            
+                        
             vCanal.writeInt(2);
             vSerializador.writeObject(nuevoProducto);    
             vSerializador.writeObject(productoOriginal);
-            vSerializador.close();
-        } catch (IOException ex) {
-            Logger.getLogger(ControladorComerciante.class.getName()).log(Level.SEVERE, null, ex);
-        } 
-        
-        //servidorPeticiones.editarProducto(nuevoProducto, productoOriginal);
-    }
-    
-    public void EliminarProducto() throws ProductoNoEncontrado{ 
-        String buscarProducto = vistaComerciante.getTxtEliminar().getText();       
-        boolean respuesta = false;
-        
-        try {   
-            vSocketCliente = new Socket("localhost", 10579);
-            vSerializador = new ObjectOutputStream(vSocketCliente.getOutputStream());
-            vCanal = new DataOutputStream(vSocketCliente.getOutputStream());
-            
-            
-            vCanal.writeInt(3);
-            vCanal.writeUTF(buscarProducto);
             
             DataInputStream vRespuesta = new DataInputStream(vSocketCliente.getInputStream());
             
@@ -174,9 +155,40 @@ public class ControladorComerciante implements ActionListener{
             vSerializador.close();
         } catch (IOException ex) {
             Logger.getLogger(ControladorComerciante.class.getName()).log(Level.SEVERE, null, ex);
-        }
+        } 
         
         if(respuesta == true){
+            JOptionPane.showMessageDialog(null, "El producto fue modificado con éxito.");
+        }else{
+            throw new ProductoNoEncontrado("El producto no fue encontrado.");
+        }
+        //servidorPeticiones.editarProducto(nuevoProducto, productoOriginal);
+    }
+    
+    public void EliminarProducto() throws ProductoNoEncontrado{ 
+        String buscarProducto = vistaComerciante.getTxtEliminar().getText();       
+        int respuesta = 0;
+        int respuestados  = 0;
+        
+        try {   
+            vSocketCliente = new Socket("localhost", 10579);
+            vSerializador = new ObjectOutputStream(vSocketCliente.getOutputStream());
+            vCanal = new DataOutputStream(vSocketCliente.getOutputStream());            
+            vRespuesta = new DataInputStream(vSocketCliente.getInputStream());
+            
+            vCanal.writeInt(3);
+            vCanal.writeUTF(buscarProducto);            
+            
+            respuesta = vRespuesta.readInt();
+            respuestados = vRespuesta.readInt();
+            JOptionPane.showMessageDialog(null, respuestados);
+            vSerializador.close();
+            vCanal.close();
+        } catch (IOException ex) {
+            Logger.getLogger(ControladorComerciante.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        
+        if(respuestados == 1){
             JOptionPane.showMessageDialog(null, "El producto " + buscarProducto + " fue eliminado con éxito.");
         }else{
             throw new ProductoNoEncontrado("El producto " + buscarProducto + " no fue encontrado.");
@@ -284,6 +296,7 @@ public class ControladorComerciante implements ActionListener{
             respuesta = vRespuesta.readBoolean();  
             
             vSerializador.close();
+            vCanal.close();
         } catch (IOException ex) {
             Logger.getLogger(ControladorComerciante.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -390,8 +403,11 @@ public class ControladorComerciante implements ActionListener{
             BuscarProducto();
         }
         if(e.getSource() == vistaComerciante.getBtnEditarProducto()){
-            EditarProducto();            
-            JOptionPane.showMessageDialog(null, "Producto modificado con éxito"); 
+            try {            
+                EditarProducto();
+            } catch (ProductoNoEncontrado ex) {
+                System.out.print("Producto no encontrado");
+            } 
             vistaComerciante.setDatos();
         }
         if(e.getSource() == vistaComerciante.getBtnModificarContacto()){

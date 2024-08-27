@@ -93,6 +93,10 @@ public class Productos implements Serializable{
     @Override
      public boolean equals (Object producto) {
         Productos producto_equal = (Productos) producto;
-        return producto_equal.getNombre_producto().equals(this.nombre_producto);
+        if(producto_equal.getNombre_producto().equals(this.nombre_producto) || producto_equal.getCategoria_producto().equals(this.categoria_producto)){
+            return true;
+        }else{
+            return false;
+        }
     }
 }

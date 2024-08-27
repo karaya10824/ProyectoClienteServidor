@@ -6,8 +6,8 @@ import Vistas.IniciarSesion;
 /*
 Integrantes:
 - Kevin Araya Jácamo
--
--
+- OVIEDO TRIGUEROS JAFET ARTURO
+- REYES LORIA GABRIEL
 -
 */
 

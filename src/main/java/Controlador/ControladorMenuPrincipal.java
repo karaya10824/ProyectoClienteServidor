@@ -70,6 +70,7 @@ public class ControladorMenuPrincipal implements ActionListener{
         String contrasenaEncontrado = vistaPrincipal.getTxtContrasena().getText();
         
         int respuesta = 0;
+        int respuestados = 0;
         
         try{          
             vSocketCliente = new Socket("localhost", 10579);
@@ -82,10 +83,13 @@ public class ControladorMenuPrincipal implements ActionListener{
                    
             DataInputStream vRespuesta = new DataInputStream(vSocketCliente.getInputStream());
             
-            respuesta = vRespuesta.readInt();            
-                        
-            if(respuesta != 0){
-                vistaComerciante = new ControladorComerciante(respuesta);
+            respuesta = vRespuesta.readInt();
+            respuestados = vRespuesta.readInt();
+            
+            if(respuestados != 0){
+                vSerializador.close();
+                vCanal.close();
+                vistaComerciante = new ControladorComerciante(respuestados);
                 vistaComerciante.mostrarVentanaComerciante();
                 JOptionPane.showMessageDialog(null, "Bienvenido al sistema");
             }else{

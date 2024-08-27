@@ -6,20 +6,23 @@ import Clases.Pedidos;
 import Clases.ProductoNoEncontrado;
 import Clases.Productos;
 import Clases.Servidor;
+import static Controlador.ControladorComerciante.nuevaPromocion;
 import static Controlador.ControladorComerciante.vistaPrincipal;
 import Vistas.ClienteMenu;
 import Vistas.ClienteProcesarPago;
 import Vistas.ComercianteMenu;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
+import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
 import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.swing.JOptionPane;
+import javax.swing.*;
 
 public class ControladorCliente implements ActionListener{
     public ClienteMenu vistaCliente; 
@@ -52,6 +55,7 @@ public class ControladorCliente implements ActionListener{
         vistaCliente.getBtnProcesarCompra().addActionListener(this);
         vistaCliente.getBtnCarritoVacio().addActionListener(this);
         vistaCliente.getBtnSalir().addActionListener(this);
+        vistaCliente.getBtnBuscarPedido().addActionListener(this);
         
         vistaProcesarPago.getBtnCerrar().addActionListener(this);
         vistaProcesarPago.getBtnProcesarPago().addActionListener(this);
@@ -74,7 +78,129 @@ public class ControladorCliente implements ActionListener{
         mostrarInformacion(productosCarrito);             
     }
     
-    public static void buscarProducto(){}
+    public void buscarProductoNombre() {
+        String NombreProducto = vistaCliente.getTxtBuscarProducto().getText();
+        
+        Productos respuesta;
+
+        try {      
+            vSocketCliente = new Socket("localhost", 10579);
+            vSerializador = new ObjectOutputStream(vSocketCliente.getOutputStream());
+            vCanal = new DataOutputStream(vSocketCliente.getOutputStream());
+
+            vCanal.writeInt(11);
+            vCanal.writeUTF(NombreProducto);
+
+            ObjectInputStream vRespuesta = new ObjectInputStream(vSocketCliente.getInputStream());
+            
+            try { 
+                respuesta = (Productos) vRespuesta.readObject();
+                vistaCliente.setDatosBuscar(respuesta);
+            } catch (ClassNotFoundException ex) {
+                Logger.getLogger(ControladorCliente.class.getName()).log(Level.SEVERE, null, ex);
+            }
+            
+            vCanal.close();
+            vSerializador.close();
+        } catch (IOException ex) {
+            Logger.getLogger(ControladorComerciante.class.getName()).log(Level.SEVERE, null, ex);
+        }   
+    }
+    
+    public void buscarProductoCategoria(){
+        String CategoriaProducto = vistaCliente.getTxtBuscarProducto().getText();
+        
+        Productos respuesta;
+
+        try {      
+            vSocketCliente = new Socket("localhost", 10579);
+            vSerializador = new ObjectOutputStream(vSocketCliente.getOutputStream());
+            vCanal = new DataOutputStream(vSocketCliente.getOutputStream());
+
+            vCanal.writeInt(12);
+            vCanal.writeUTF(CategoriaProducto);
+
+            ObjectInputStream vRespuesta = new ObjectInputStream(vSocketCliente.getInputStream());
+            
+            try { 
+                respuesta = (Productos) vRespuesta.readObject();
+                vistaCliente.setDatosBuscar(respuesta);
+            } catch (ClassNotFoundException ex) {
+                Logger.getLogger(ControladorCliente.class.getName()).log(Level.SEVERE, null, ex);
+            }
+            
+            vCanal.close();
+            vSerializador.close();
+        } catch (IOException ex) {
+            Logger.getLogger(ControladorComerciante.class.getName()).log(Level.SEVERE, null, ex);
+        }               
+    }    
+    
+    public void mostrarPedidos(){        
+        Pedidos respuesta;
+        
+        try {      
+            int CorreoOid = Integer.parseInt(vistaCliente.getTxtCorreoOid().getText());
+            vSocketCliente = new Socket("localhost", 10579);
+            vSerializador = new ObjectOutputStream(vSocketCliente.getOutputStream());
+            vCanal = new DataOutputStream(vSocketCliente.getOutputStream());
+
+            vCanal.writeInt(19);
+            vCanal.writeInt(CorreoOid);
+
+            ObjectInputStream vRespuesta = new ObjectInputStream(vSocketCliente.getInputStream());
+            
+                try { 
+                    respuesta = (Pedidos) vRespuesta.readObject();
+                    if(respuesta.getNumero_pedido() != 0){
+                        vistaCliente.setDatosPedidos(respuesta);
+                    }else{
+                        JOptionPane.showMessageDialog(null, "Pedido no encontrado");
+                    }      
+                    
+                } catch (ClassNotFoundException ex) {
+                    Logger.getLogger(ControladorCliente.class.getName()).log(Level.SEVERE, null, ex);
+                }                      
+
+            vCanal.close();
+            vSerializador.close();
+        } catch (IOException ex) {
+            JOptionPane.showMessageDialog(null, "Pedido no encontrado");
+        }  
+    }
+    
+    public void mostrarPedidosPorCorreo(){
+         Pedidos respuesta;
+        
+        try {      
+            String CorreoOid = vistaCliente.getTxtCorreoOid().getText();
+            vSocketCliente = new Socket("localhost", 10579);
+            vSerializador = new ObjectOutputStream(vSocketCliente.getOutputStream());
+            vCanal = new DataOutputStream(vSocketCliente.getOutputStream());
+
+            vCanal.writeInt(20);
+            vCanal.writeUTF(CorreoOid);
+
+            ObjectInputStream vRespuesta = new ObjectInputStream(vSocketCliente.getInputStream());
+            
+                try { 
+                    respuesta = (Pedidos) vRespuesta.readObject();
+                    if(respuesta.getNumero_pedido() != 0){                        
+                        vistaCliente.setDatosPedidos(respuesta);
+                    }else{
+                        JOptionPane.showMessageDialog(null, "Pedido no encontrado");
+                    }      
+                    
+                } catch (ClassNotFoundException ex) {
+                    Logger.getLogger(ControladorCliente.class.getName()).log(Level.SEVERE, null, ex);
+                }                      
+
+            vCanal.close();
+            vSerializador.close();
+        } catch (IOException ex) {
+            JOptionPane.showMessageDialog(null, "Pedido no encontrado");
+        }  
+    }
     
     public void mostrarInformacion(ArrayList<CarritodeCompras> carritoMetodos){
         nuevoPedido = servidorPeticiones.calcularTotalCarrito(carritoMetodos);
@@ -97,6 +223,8 @@ public class ControladorCliente implements ActionListener{
     
     public void vaciarCarrito(){
         productosCarrito = servidorPeticiones.vaciarCarrito();
+        vistaCliente.setLblDescuento("0.00");
+        vistaCliente.setLblTotal(0.00);
         mostrarInformacion(productosCarrito);  
     }
     
@@ -136,7 +264,16 @@ public class ControladorCliente implements ActionListener{
         }   
         
         if(e.getSource() == vistaCliente.getBtnBuscarProducto()){
-            buscarProducto();
+            ButtonModel selectedModel = vistaCliente.buttonGroup1.getSelection();
+            
+            if(selectedModel != null){
+                String SelectedOption = selectedModel.getActionCommand();
+                if(SelectedOption.equals("Nombre")){
+                    buscarProductoNombre();                
+                }else if(SelectedOption.equals("Categoria")){
+                    buscarProductoCategoria();
+                }
+            }                       
         }   
         
         if(e.getSource() == vistaCliente.getBtnDescuento()){
@@ -154,6 +291,19 @@ public class ControladorCliente implements ActionListener{
             else{
                 vistaProcesarPago.setVisible(true);
             }
+        }  
+        
+        if(e.getSource() == vistaCliente.getBtnBuscarPedido()){
+            ButtonModel selectedModel = vistaCliente.buttonGroup2.getSelection();
+            
+            if(selectedModel != null){
+                String SelectedOption = selectedModel.getActionCommand();
+                if(SelectedOption.equals("pedido")){
+                    mostrarPedidos();                
+                }else if(SelectedOption.equals("correoelectronico")){
+                    mostrarPedidosPorCorreo();
+                }
+            }            
         }  
         
         if(e.getSource() == vistaCliente.getBtnSalir()){
