@@ -1,10 +1,9 @@
 package Clases;
 
-import java.io.Serializable;
-
-public class Clientes extends Usuarios implements Serializable{
+public class Clientes extends Usuarios{
     public String nombreCompleto;
     public String direccionCliente;
+    public String nuevavariable;
 
     public Clientes() {}
 

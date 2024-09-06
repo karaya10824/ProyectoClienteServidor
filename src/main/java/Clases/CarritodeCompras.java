@@ -1,6 +1,8 @@
 package Clases;
 
-public class CarritodeCompras {
+import java.io.Serializable;
+
+public class CarritodeCompras implements Serializable{
     public Productos producto;
     public int cantidad;
 

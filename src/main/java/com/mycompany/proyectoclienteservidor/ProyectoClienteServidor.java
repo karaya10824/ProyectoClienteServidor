@@ -1,7 +1,6 @@
 package com.mycompany.proyectoclienteservidor;
 
 import Controlador.ControladorMenuPrincipal;
-import Vistas.IniciarSesion;
 
 /*
 Integrantes:
@@ -19,5 +18,10 @@ public class ProyectoClienteServidor {
         
         /*IniciarSesion is = new IniciarSesion();
         is.setVisible(true);*/
+        
+//        ProcesarCompra pc = new ProcesarCompra("kevin87@gmail.com");
+//        pc.start();
+//        System.out.print(pc.getPedido().getNumero_pedido());
+//        System.out.print(pc.getPedido().getProductosSeleccionados());
     }
 }

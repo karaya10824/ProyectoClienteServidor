@@ -14,8 +14,7 @@ public class ConexionBD {
             nuevaConexion = DriverManager.getConnection("jdbc:mysql://localhost/proyectoClienteServidor?serverTimezone=UTC", "root", "Ar4y4.24");
         } catch (SQLException ex) {
             Logger.getLogger(ConexionBD.class.getName()).log(Level.SEVERE, null, ex);
-        } finally{
-            return nuevaConexion;
-        }
+        } 
+        return nuevaConexion;
     }
 }

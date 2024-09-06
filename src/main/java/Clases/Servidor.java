@@ -1,8 +1,5 @@
 package Clases;
 
-import Controlador.ControladorComerciante;
-import Controlador.ControladorMenuPrincipal;
-import Vistas.IniciarSesion;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.FileInputStream;
@@ -39,6 +36,7 @@ public class Servidor extends Thread{
         this.bitacora = bitacora;
     }        
     
+    @Override
     public void run(){
         ServerSocket vSocketServidor;
         try {
@@ -153,7 +151,8 @@ public class Servidor extends Thread{
                     //Transacciones de comerciante
                     //10 = Mostrar Productos
                     else if(numeroTransaccion == 10){
-
+                        Productos RespuestaProductos = buscarProductosPorNombre(vCanal.readUTF());
+                        vRespuestaO.writeObject(RespuestaProductos);
                     }                    
                     //11 = Buscar Productos por nombre 
                     else if(numeroTransaccion == 11){
@@ -167,33 +166,43 @@ public class Servidor extends Thread{
                     }
                     //13 = Filtrar por Precio
                     else if(numeroTransaccion == 13){
-
+                        
 
                     }
                     //14 = Agregar productos al carrito
                     else if(numeroTransaccion == 14){
-
-
+                        CarritodeCompras nc = new CarritodeCompras();
+                        nc = (CarritodeCompras) vDeserializador.readObject();
+                        vRespuestaO.writeObject(agregarAlCarrito(nc));                        
                     }
                     //15 = Aplicar promocion
                     else if(numeroTransaccion == 15){
-
-
+                        String promocion = vCanal.readUTF();
+                        nuevoPedido = (Pedidos) vDeserializador.readObject();
+                        
+                        this.bitacora.append(promocion + "\n");
+                        this.bitacora.append(nuevoPedido.getPrecioNeto()+ "\n");
+                        Pedidos pedido = AplicarDescuento(promocion, nuevoPedido);                        
+                        if(pedido != null){
+                            vRespuesta.writeInt(1);
+                            vRespuestaO.writeObject(pedido); 
+                        }else{
+                            vRespuesta.writeInt(0);
+                            vRespuestaO.writeObject(pedido); 
+                        }                    
                     }
                     //16 = Procesar Compra
                     else if(numeroTransaccion == 16){
-
-
+                        productosCarrito = (ArrayList<CarritodeCompras>) vDeserializador.readObject();
+                        Clientes nuevocliente =(Clientes) vDeserializador.readObject();
+                        Pedidos nuevopPedido = (Pedidos) vDeserializador.readObject();
+                        ProcesarCompra(productosCarrito, nuevocliente, nuevopPedido);
+                        vRespuesta.writeInt(1);                        
                     }
                     //17 = Vaciar Carrito
                     else if(numeroTransaccion == 17){
-
-
-                    }
-                    //18 = Buscar Pedidos
-                    else if(numeroTransaccion == 18){
-
-
+                        productosCarrito = vaciarCarrito();
+                        vRespuestaO.writeObject(productosCarrito);                        
                     }
                     //19 = Mostrar Pedidos por ID
                     else if(numeroTransaccion == 19){
@@ -205,17 +214,17 @@ public class Servidor extends Thread{
                         Pedidos RespuestaProductos = mostrarPedidosCorreo(vCanal.readUTF());
                         vRespuestaO.writeObject(RespuestaProductos); 
                     }
-                    //21
-                    else if(numeroTransaccion == 21){
-
-
-                    }   
+                    else if(numeroTransaccion == 21){                        
+                        Pedidos PedidoInformar = DevolverCompra(vCanal.readUTF());
+                        vRespuestaO.writeObject(PedidoInformar); 
+                    }
                     
-                    vCanal.close();
-                    vRespuesta.close();
-                    vRespuestaO.close();
-                    vDeserializador.close();
-                }                              
+
+                }
+               /* vCanal.close();
+                vRespuesta.close();
+                vRespuestaO.close();
+                vDeserializador.close();*/
             }catch (IOException ex) {
                System.out.print(this + "s" + ex.getMessage());
             } catch (Exception e) {
@@ -301,6 +310,14 @@ public class Servidor extends Thread{
         }              
                 
         return productoEncontrado;
+    }
+    
+    public Pedidos DevolverCompra(String correoCliente){
+        this.bitacora.append(correoCliente + "\n");
+        ProcesarCompra pc = new ProcesarCompra(correoCliente);
+        pc.start();
+        this.bitacora.append(pc.getPedido().getProductosSeleccionados() + "\n");
+        return pc.getPedido();
     }
     
     //Método para mostrar la información del comerciante
@@ -656,11 +673,11 @@ public class Servidor extends Thread{
         return nuevoPedido;
     }
     
-    public void AplicarDescuento(String CodigoPromocional){
+    public Pedidos AplicarDescuento(String CodigoPromocional, Pedidos nuevoPedido){
         promociones = DesSerializarPromociones();
         
         Promociones aplicarPromocion = new Promociones();
-        aplicarPromocion.setCodigoPromocional(CodigoPromocional);
+        aplicarPromocion.setCodigoPromocional(CodigoPromocional);        
         
         if(promociones.contains(aplicarPromocion)){
             int index = promociones.indexOf(aplicarPromocion);
@@ -670,8 +687,9 @@ public class Servidor extends Thread{
         }else{
             System.out.print("Promocion no dispoinble");
         }
-        
+        return nuevoPedido;
     }
+    
     public ArrayList<CarritodeCompras> vaciarCarrito(){
         productosCarrito.clear();
         return productosCarrito;
@@ -715,7 +733,6 @@ public class Servidor extends Thread{
             comandoInsertPreparado.executeUpdate();
 
             //Mensaje final
-            JOptionPane.showMessageDialog(null, "Pedido registrado con éxito");
             System.out.print("Se ha ingresado el pedido correctamente");    
         }catch (SQLException ex) {
             Logger.getLogger(ConexionBD.class.getName()).log(Level.SEVERE, null, ex);

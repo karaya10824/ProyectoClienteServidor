@@ -341,7 +341,6 @@ public class ClienteMenu extends javax.swing.JFrame {
         btnCarritoVacio = new javax.swing.JButton();
         lblDescuento1 = new javax.swing.JLabel();
         jPanel6 = new javax.swing.JPanel();
-        jLabel7 = new javax.swing.JLabel();
         jLabel8 = new javax.swing.JLabel();
         btnSalir = new javax.swing.JButton();
 
@@ -620,6 +619,11 @@ public class ClienteMenu extends javax.swing.JFrame {
         jScrollPane2.setViewportView(tblCarrito);
 
         btnProcesarCompra.setText("Procesar Compra");
+        btnProcesarCompra.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnProcesarCompraActionPerformed(evt);
+            }
+        });
 
         jLabel3.setText("¿Tienes un código de descuento? Aplicalo abajo");
 
@@ -653,35 +657,36 @@ public class ClienteMenu extends javax.swing.JFrame {
                 .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(jScrollPane2, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 674, Short.MAX_VALUE)
                     .addGroup(jPanel5Layout.createSequentialGroup()
-                        .addContainerGap()
                         .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jLabel3)
                             .addGroup(jPanel5Layout.createSequentialGroup()
-                                .addComponent(txtDescuento, javax.swing.GroupLayout.PREFERRED_SIZE, 221, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                                .addComponent(btnDescuento))
+                                .addContainerGap()
+                                .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addGroup(jPanel5Layout.createSequentialGroup()
+                                        .addComponent(txtDescuento, javax.swing.GroupLayout.PREFERRED_SIZE, 221, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                        .addComponent(btnDescuento))
+                                    .addGroup(jPanel5Layout.createSequentialGroup()
+                                        .addComponent(jLabel11)
+                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                        .addComponent(lblSubtotal))
+                                    .addGroup(jPanel5Layout.createSequentialGroup()
+                                        .addComponent(jLabel10)
+                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                        .addComponent(lblDescuento)
+                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                        .addComponent(lblDescuento1))
+                                    .addGroup(jPanel5Layout.createSequentialGroup()
+                                        .addComponent(jLabel12)
+                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                        .addComponent(lblTotal))
+                                    .addComponent(jLabel3)))
                             .addGroup(jPanel5Layout.createSequentialGroup()
-                                .addComponent(jLabel11)
+                                .addGap(216, 216, 216)
+                                .addComponent(btnProcesarCompra)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(lblSubtotal))
-                            .addGroup(jPanel5Layout.createSequentialGroup()
-                                .addComponent(jLabel10)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(lblDescuento)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(lblDescuento1))
-                            .addGroup(jPanel5Layout.createSequentialGroup()
-                                .addComponent(jLabel12)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(lblTotal)))
-                        .addGap(0, 300, Short.MAX_VALUE)))
+                                .addComponent(btnCarritoVacio)))
+                        .addGap(0, 0, Short.MAX_VALUE)))
                 .addContainerGap())
-            .addGroup(jPanel5Layout.createSequentialGroup()
-                .addGap(216, 216, 216)
-                .addComponent(btnProcesarCompra)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(btnCarritoVacio)
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         jPanel5Layout.setVerticalGroup(
             jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -729,8 +734,6 @@ public class ClienteMenu extends javax.swing.JFrame {
 
         jTabbedPane4.addTab("Notificaciones", jPanel6);
 
-        jLabel7.setText("Menú de Inventario | Comerciante");
-
         jLabel8.setText("ECOMMERCE");
 
         btnSalir.setText("Salir");
@@ -754,11 +757,6 @@ public class ClienteMenu extends javax.swing.JFrame {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addComponent(btnSalir)
                 .addContainerGap())
-            .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                .addGroup(layout.createSequentialGroup()
-                    .addGap(325, 325, 325)
-                    .addComponent(jLabel7)
-                    .addContainerGap(166, Short.MAX_VALUE)))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -770,11 +768,6 @@ public class ClienteMenu extends javax.swing.JFrame {
                 .addGap(18, 18, 18)
                 .addComponent(jTabbedPane4)
                 .addContainerGap())
-            .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                .addGroup(layout.createSequentialGroup()
-                    .addGap(373, 373, 373)
-                    .addComponent(jLabel7)
-                    .addContainerGap(490, Short.MAX_VALUE)))
         );
 
         pack();
@@ -795,6 +788,10 @@ public class ClienteMenu extends javax.swing.JFrame {
     private void btnSalirActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSalirActionPerformed
         // TODO add your handling code here:
     }//GEN-LAST:event_btnSalirActionPerformed
+
+    private void btnProcesarCompraActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnProcesarCompraActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_btnProcesarCompraActionPerformed
 
     /**
      * @param args the command line arguments
@@ -853,7 +850,6 @@ public class ClienteMenu extends javax.swing.JFrame {
     private javax.swing.JLabel jLabel4;
     private javax.swing.JLabel jLabel5;
     private javax.swing.JLabel jLabel6;
-    private javax.swing.JLabel jLabel7;
     private javax.swing.JLabel jLabel8;
     private javax.swing.JLabel jLabel9;
     private javax.swing.JLayeredPane jLayeredPane1;

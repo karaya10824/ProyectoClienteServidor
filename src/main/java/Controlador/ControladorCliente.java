@@ -72,9 +72,29 @@ public class ControladorCliente implements ActionListener{
         int cantidad = (Integer) vistaCliente.getTxtCantidad().getValue();
         
         AgregarProductoCarrito.setProducto(servidorPeticiones.buscarProductosPorNombre(vistaCliente.getTxtNombreProducto().getText()));    
-        AgregarProductoCarrito.setCantidad(cantidad);          
+        AgregarProductoCarrito.setCantidad(cantidad);    
+                
+        try{      
+            vSocketCliente = new Socket("localhost", 10579);
+            vSerializador = new ObjectOutputStream(vSocketCliente.getOutputStream());
+            vCanal = new DataOutputStream(vSocketCliente.getOutputStream());
+
+            vCanal.writeInt(14);
+            vSerializador.writeObject(AgregarProductoCarrito);
+
+            ObjectInputStream vRespuesta = new ObjectInputStream(vSocketCliente.getInputStream());
+            
+            productosCarrito = (ArrayList<CarritodeCompras>) vRespuesta.readObject();
+            
+            vCanal.close();
+            vSerializador.close();
+        } catch (IOException ex) {
+            Logger.getLogger(ControladorComerciante.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (ClassNotFoundException ex) {
+            Logger.getLogger(ControladorCliente.class.getName()).log(Level.SEVERE, null, ex);
+        }
         
-        productosCarrito = servidorPeticiones.agregarAlCarrito(AgregarProductoCarrito);  
+        //productosCarrito = servidorPeticiones.agregarAlCarrito(AgregarProductoCarrito);  
         mostrarInformacion(productosCarrito);             
     }
     
@@ -170,7 +190,7 @@ public class ControladorCliente implements ActionListener{
     }
     
     public void mostrarPedidosPorCorreo(){
-         Pedidos respuesta;
+        Pedidos respuesta;
         
         try {      
             String CorreoOid = vistaCliente.getTxtCorreoOid().getText();
@@ -212,17 +232,64 @@ public class ControladorCliente implements ActionListener{
         vistaCliente.setLblSubtotal(Double.toString(nuevoPedido.getPrecioNeto() - nuevoPedido.getPrecio_descuento()));
     }    
     
-    public void aplicarDescuento(){
-        System.out.print(vistaCliente.getTxtDescuento().getText());
-        servidorPeticiones.AplicarDescuento(vistaCliente.getTxtDescuento().getText());
+    public void aplicarDescuento(){       
+        int respuesta = 0;
         
-        nuevoPedido.setCodigo_promocional(vistaCliente.getTxtDescuento().getText());
-        vistaCliente.setLblDescuento(Double.toString(nuevoPedido.getPrecioNeto() * nuevoPedido.getPrecio_descuento() / 100));
-        vistaCliente.setLblSubtotal(Double.toString(nuevoPedido.getPrecioNeto() - (nuevoPedido.getPrecioNeto() * nuevoPedido.getPrecio_descuento() / 100)));
+        try{      
+            vSocketCliente = new Socket("localhost", 10579);
+            vSerializador = new ObjectOutputStream(vSocketCliente.getOutputStream());
+            vCanal = new DataOutputStream(vSocketCliente.getOutputStream());
+
+            vCanal.writeInt(15);
+            vCanal.writeUTF(vistaCliente.getTxtDescuento().getText());
+            vSerializador.writeObject(nuevoPedido);
+
+            DataInputStream vRespuesta = new DataInputStream(vSocketCliente.getInputStream());
+            ObjectInputStream vRespuestaO = new ObjectInputStream(vSocketCliente.getInputStream());                        
+            
+            respuesta = vRespuesta.readInt();
+            nuevoPedido = (Pedidos) vRespuestaO.readObject();                        
+            
+        } catch (IOException ex) {
+            Logger.getLogger(ControladorComerciante.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (ClassNotFoundException ex) {
+            Logger.getLogger(ControladorCliente.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        
+        if(respuesta == 1){
+            nuevoPedido.setCodigo_promocional(vistaCliente.getTxtDescuento().getText());
+            vistaCliente.setLblDescuento(Double.toString(nuevoPedido.getPrecioNeto() * nuevoPedido.getPrecio_descuento() / 100));
+            vistaCliente.setLblSubtotal(Double.toString(nuevoPedido.getPrecioNeto() - (nuevoPedido.getPrecioNeto() * nuevoPedido.getPrecio_descuento() / 100)));
+            JOptionPane.showMessageDialog(null, "Promoción aplicada");
+        }else{
+            JOptionPane.showMessageDialog(null, "Promoción no disponible");
+        }
+        
+        //servidorPeticiones.AplicarDescuento(vistaCliente.getTxtDescuento().getText());                
     }
     
     public void vaciarCarrito(){
-        productosCarrito = servidorPeticiones.vaciarCarrito();
+        //productosCarrito = servidorPeticiones.vaciarCarrito();
+        
+        try{      
+            vSocketCliente = new Socket("localhost", 10579);
+            vSerializador = new ObjectOutputStream(vSocketCliente.getOutputStream());
+            vCanal = new DataOutputStream(vSocketCliente.getOutputStream());
+
+            vCanal.writeInt(17);
+
+            ObjectInputStream vRespuesta = new ObjectInputStream(vSocketCliente.getInputStream());
+            
+            productosCarrito = (ArrayList<CarritodeCompras>) vRespuesta.readObject();
+            
+            vCanal.close();
+            vSerializador.close();
+        } catch (IOException ex) {
+            Logger.getLogger(ControladorComerciante.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (ClassNotFoundException ex) {
+            Logger.getLogger(ControladorCliente.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        
         vistaCliente.setLblDescuento("0.00");
         vistaCliente.setLblTotal(0.00);
         mostrarInformacion(productosCarrito);  
@@ -233,8 +300,46 @@ public class ControladorCliente implements ActionListener{
         cliente.setCorreoElectronico(vistaProcesarPago.getTxtCorreoCliente().getText());
         cliente.setDireccion(vistaProcesarPago.getTxtDireccion().getText());
         cliente.setNumeroTelefonico(vistaProcesarPago.getTxtNumeroTelefono().getText());
+        Pedidos pedidoMostrar = new Pedidos();
         
-        servidorPeticiones.ProcesarCompra(productosCarrito, cliente, nuevoPedido);
+        try {      
+            vSocketCliente = new Socket("localhost", 10579);
+            vSerializador = new ObjectOutputStream(vSocketCliente.getOutputStream());
+            vCanal = new DataOutputStream(vSocketCliente.getOutputStream());
+
+            vCanal.writeInt(16);
+            vSerializador.writeObject(productosCarrito);
+            vSerializador.writeObject(cliente);
+            vSerializador.writeObject(nuevoPedido);
+
+            vCanal.close();
+            vSerializador.close();
+        } catch (IOException ex) {
+            JOptionPane.showMessageDialog(null, "Pedido no encontrado");
+        } 
+        JOptionPane.showMessageDialog(null, "Su pago ha sido procesado con éxito");
+        
+        try {      
+            vSocketCliente = new Socket("localhost", 10579);
+            vSerializador = new ObjectOutputStream(vSocketCliente.getOutputStream());
+            vCanal = new DataOutputStream(vSocketCliente.getOutputStream());
+
+            vCanal.writeInt(21);
+            vCanal.writeUTF(cliente.getCorreoElectronico());            
+
+            ObjectInputStream vRespuesta = new ObjectInputStream(vSocketCliente.getInputStream());
+            
+            pedidoMostrar = (Pedidos) vRespuesta.readObject();//respuesta = vRespuesta.read
+
+            vCanal.close();
+            vSerializador.close();
+        } catch (IOException ex) {
+            JOptionPane.showMessageDialog(null, "Pedido no encontrado");
+        } catch (ClassNotFoundException ex) {          
+            Logger.getLogger(ControladorCliente.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        
+        JOptionPane.showMessageDialog(null, "Número de envío: " + pedidoMostrar.getNumeroEnvio() + "\n" + "La información será enviada a su correo: " + cliente.getCorreoElectronico() + "\nProductos: " + pedidoMostrar.getProductosSeleccionados());
     }
     
     public void cerrarSesion(){     

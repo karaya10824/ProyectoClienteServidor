@@ -1,22 +1,6 @@
 package Vistas;
 
-import Clases.ComercianteNoEncontrado;
-import Clases.Comerciantes;
-import Controlador.ControladorComerciante;
-import java.awt.Color;
-import java.io.DataOutputStream;
-import java.io.IOException;
-import java.io.ObjectOutputStream;
-import java.net.Socket;
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.swing.JButton;
-import javax.swing.JOptionPane;
 import javax.swing.JTextField;
 
 public class IniciarSesion extends javax.swing.JFrame {    
